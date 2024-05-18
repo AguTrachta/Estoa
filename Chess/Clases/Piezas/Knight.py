@@ -1,9 +1,9 @@
 import pygame
 import os
+from Clases.Constantes import *
 
-class Knight:
-    def __init__(self, color):
-        self.color = color
-        self.images_dir = os.path.join("Clases", "Imagenes")
-        self.image_white = pygame.image.load(os.path.join(self.images_dir, "white knight.png"))
-        self.image_black = pygame.image.load(os.path.join(self.images_dir, "black knight.png"))
+class Bishop:
+    def __init__(self, Square, image, color, type, row, col):
+        
+        Black_Knight = pygame.transform.scale(pygame.image.load(os.path.join("Clases/Imagenes","bKN.png")), (Square, Square))
+        White_Knight = pygame.transform.scale(pygame.image.load(os.path.join("Clases/Imagenes", "wKN.png")), (Square, Square))

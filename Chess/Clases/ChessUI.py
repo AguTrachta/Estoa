@@ -1,179 +1,95 @@
+
 import pygame
-import os
-import sys
+from Clases.Piezas import Bishop
+from Clases.Piezas import King
+from Clases.Piezas import Knight
+from Clases.Piezas import Queen
+from Clases.Piezas import Rook
+from Clases.Piezas import Pawn
+from Constantes import *
 
-from Clases.Piezas.Pawn import Pawn
-from Clases.Piezas.Bishop import Bishop
-from Clases.Piezas.Rook import Rook
-from Clases.Piezas.Knight import Knight
-from Clases.Piezas.King import King
-from Clases.Piezas.Queen import Queen
 
-class ChessUI:
-    def __init__(self, window_width=600, window_height=600):
-        # Inicialización de Pygame
-        pygame.init()
+class newBoard:
+    def __init__(self, Width, Height, Rows, Cols, Square, Win):
+        self.Width = Width
+        self.Height = Height
+        self.Square = Square
+        self.GameBoard = self.Width//2
+        self.Win = Win
+        self.Rows = Rows
+        self.Cols = Cols
+        self.Board = []
+        self.create_Board()
 
-        COLORES_PIEZAS = {
-            "blanco": (255, 255, 255),  # Color blanco
-            "negro": (0, 0, 0),          # Color negro
-        }       
 
-        # Dimensiones de la ventana
-        self.window_width = window_width
-        self.window_height = window_height
 
-        # Definir colores
-        self.WHITE = (255, 231, 186)  # Beige para los cuadrados blancos
-        self.BLACK = (165, 113, 71)   # Marrón para los cuadrados negros
+    def create_Board(self):
+        for row in range(self.Rows):
 
-        # Crear ventana
-        self.window = pygame.display.set_mode((self.window_width, self.window_height))
-        pygame.display.set_caption("Tablero de Ajedrez")
+            self.Board.append([0 for i in range(self.Cols)])
 
-        # Tamaño del cuadrado del tablero
-        self.square_size = self.window_width // 8  
+            for col in range(self.Cols):
+                if row == 1:
+                    self.Board[row][col] = Pawn(self.Square,Black_Pawn,Black,"Pawn",row,col)
+                if row == 6:    
+                    self.Board[row][col] = Pawn(self.Square,White_pawn,White,"Pawn",row,col)
 
-        # Directorio donde se encuentran las imágenes de las piezas
-        self.images_dir = os.path.join("Clases", "Imagenes")
-        
-        #Tamaño de los peones
-        self.pieces_size = (50, 50)  # Anchura y altura deseada para los peones
-        
-        #Peones
-        self.pawn = Pawn()
-        # Cargar imágenes de los peones blancos y negros y ajustar su tamaño
-        self.white_pawn = pygame.transform.scale(self.pawn.image_white, self.pieces_size)
-        self.black_pawn = pygame.transform.scale(self.pawn.image_black, self.pieces_size)
-        
-        #Torres
-        self.rook = Rook()
-        
-        self.white_rook = pygame.transform.scale(self.rook.image_white, self.pieces_size)
-        self.black_rook = pygame.transform.scale(self.rook.image_black, self.pieces_size)
-        
-        #Alfiles
-        self.bishop = Bishop()
-        
-        self.white_bishop = pygame.transform.scale(self.bishop.image_white, self.pieces_size) 
-        self.black_bishop = pygame.transform.scale(self.bishop.image_black, self.pieces_size) 
+                if row == 0:
+                    if col == 0 or col == 7:
+                        self.Board[row][col] = Rook(self.Square, Black_Rook,Black,"Rook",row,col)
 
-        #Caballos
-        self.knight = Knight()
-        
-        self.white_knight = pygame.transform.scale(self.knight.image_white, self.pieces_size) 
-        self.black_knight = pygame.transform.scale(self.knight.image_black, self.pieces_size) 
-        
-        #King
-        self.king = King()
-        
-        self.white_king = pygame.transform.scale(self.king.image_white, self.pieces_size) 
-        self.black_king= pygame.transform.scale(self.king.image_black, self.pieces_size) 
-        
-        #Queen
-        self.queen = Queen()
-        
-        self.white_queen = pygame.transform.scale(self.queen.image_white, self.pieces_size) 
-        self.black_queen = pygame.transform.scale(self.queen.image_black, self.pieces_size) 
+                    if col == 1 or col == 6:
+                        self.Board[row][col] = Knight(self.Square, Black_Knight,Black,"Knight",row,col)
 
-    def draw_chessboard(self):
-        for row in range(8):
-            for col in range(8):
-                if (row + col) % 2 == 0:
-                    color = self.WHITE
-                else:
-                    color = self.BLACK
-                pygame.draw.rect(self.window, color, (col * self.square_size, row * self.square_size, self.square_size, self.square_size))
+                    if col == 2 or col == 5:
+                        self.Board[row][col] = Bishop(self.Square, Black_Bishop,Black,"Bishop",row,col)
 
-    def draw_pawns(self, COLORES_PIEZAS):
-        for row in range(8):
-            if row == 1:
-                for col in range(8):
-                    x = col * self.square_size + (self.square_size - self.pieces_size[0]) // 2
-                    y = row * self.square_size + (self.square_size - self.pieces_size[0]) // 2 
-                    color = COLORES_PIEZAS["blanca"]
-                    self.window.blit(self.white_pawn, (x, y))
-            elif row == 6:
-                for col in range(8):
-                    x = col * self.square_size + (self.square_size - self.pieces_size[0]) // 2
-                    y = row * self.square_size + (self.square_size - self.pieces_size[1]) // 2
-                    color = COLORES_PIEZAS["negra"]
-                    self.window.blit(self.black_pawn, (x, y))
-                    
-    def draw_rooks(self, color):
-            # Dibujar torres blancas en las esquinas superiores
-        if color == "blanco":
-            self.window.blit(self.white_rook, (self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            self.window.blit(self.white_rook, ((7 * self.square_size) + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            # Dibujar torres negras en las esquinas inferiores
-        elif color == "negro":
-            self.window.blit(self.black_rook, (self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
-            self.window.blit(self.black_rook, ((7 * self.square_size) + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
+                    if col == 3:
+                        self.Board[row][col] = Queen(self.Square, Black_Queen,Black,"Queen",row,col)
 
-    def draw_knights(self, color):
-        if color == "blanco": 
-            # Dibujar caballos blancos en las esquinas superiores
-            self.window.blit(self.white_knight, (self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            self.window.blit(self.white_knight, ((6 * self.square_size) + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            # Dibujar caballos negros en las esquinas inferiores
-        elif color == "negro":
-            self.window.blit(self.black_knight, (self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
-            self.window.blit(self.black_knight, ((6 * self.square_size) + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
+                    if col == 4:
+                        self.Board[row][col] = King(self.Square, Black_King,Black,"King",row,col)
 
-    def draw_bishops(self, color):
-            # Dibujar alfiles blancos en las esquinas superiores
-        if color == "blanco": 
-            self.window.blit(self.white_bishop, (2 * self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            self.window.blit(self.white_bishop, ((5 * self.square_size) + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            # Dibujar alfiles negros en las esquinas inferiores
-        elif color == "negro":
-            self.window.blit(self.black_bishop, (2 * self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
-            self.window.blit(self.black_bishop, ((5 * self.square_size) + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
-        
-    def draw_queen(self, color):
-            # Dibujar reinas blancos en las esquinas superiores
-        if color == "blanco":
-            self.window.blit(self.white_queen, (3 * self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            # Dibujar reinas negros en las esquinas inferiores
-        elif color == "negro":
-            self.window.blit(self.black_queen, (3 * self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
+                if row == 7:
+                    if col == 0 or col  == 7:
+                        self.Board[row][col] = Rook(self.Square, White_Rook,White,"Rook",row,col)
 
-    def draw_king(self, color):
-            # Dibujar reinas blancos en las esquinas superiores
-        if color == "blanco":
-            self.window.blit(self.white_king, (4 * self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, self.square_size // 2 - self.pieces_size[1] // 2))
-            # Dibujar reinas negros en las esquinas inferiores
-        elif color == "negro": 
-            self.window.blit(self.black_king, (4 * self.square_size + self.square_size // 2 - self.pieces_size[0] // 2, (7 * self.square_size) + self.square_size // 2 - self.pieces_size[1] // 2))
+                    if col == 1 or col == 6:
+                        self.Board[row][col] = Knight(self.Square, White_Knight,White,"Knight",row,col)
 
-    def run(self):
-        # Bucle principal del juego
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+                    if col == 2 or col == 5:
+                        self.Board[row][col] = Bishop(self.Square, White_bishop,White,"Bishop",row,col)
 
-            # Dibujar el tablero de ajedrez
-            self.window.fill(self.WHITE)  # Llenar la ventana con color blanco
-            self.draw_chessboard()
+                    if col == 3:
+                        self.Board[row][col] = Queen(self.Square, White_Queen,White,"Queen",row,col)
 
-            # Dibujar peones en el tablero
-            self.draw_pawns()
-            self.draw_rooks("blanco")
-            self.draw_rooks("negro")
-            self.draw_knights("blanco")
-            self.draw_knights("negro")
-            self.draw_bishops("blanco")
-            self.draw_bishops("negro")
-            self.draw_queen("blanco")
-            self.draw_king()
+                    if col == 4:
+                        self.Board[row][col] = King(self.Square, White_King,White,"King",row,col)
 
-            # Actualizar la pantalla
-            pygame.display.update()
+    def get_piece(self,row,col):
+        return self.Board[row][col]
 
-                
+    def move(self,piece,row,col):
+        self.Board[piece.row][piece.col], self.Board[row][col] = self.Board[row][col], self.Board[piece.row][piece.col]
+        piece.piece_move(row,col)
 
-        # Salir del programa
-        pygame.quit()
-        sys.exit()
+        if piece.type == "Pawn":
+            if piece.first_move:
+                piece.first_move = False
+
+
+    def draw_Board(self):
+        self.Win.fill(brown)
+
+        for row in range(Rows):
+            for col in range(row%2, Cols,2):
+                pygame.draw.rect(self.Win,White,(Square*(row), Square*(col),Square,Square))
+
+    def draw_piece(self,piece,Win):
+        Win.blit(piece.image, (piece.x, piece.y))
+
+    def draw_pieces(self):
+        for row in range(self.Rows):
+            for col in range(self.Cols):
+                if self.Board[row][col] != 0:
+                    self.draw_piece(self.Board[row][col], self.Win)

@@ -1,9 +1,9 @@
 import pygame
 import os
+from Clases.Constantes import *
 
 class Queen:
-    def __init__(self, color):
-        self.color = color
-        self.images_dir = os.path.join("Clases", "Imagenes")
-        self.image_white = pygame.image.load(os.path.join(self.images_dir, "white queen.png"))
-        self.image_black = pygame.image.load(os.path.join(self.images_dir, "black queen.png"))
+    def __init__(self, Square, image, color, type, row, col):
+        
+        Black_Queen = pygame.transform.scale(pygame.image.load(os.path.join("Clases/Imagenes", "bQ.png")), (Square, Square))
+        White_Queen = pygame.transform.scale(pygame.image.load(os.path.join("Clases/Imagenes", "wQ.png")), (Square, Square))

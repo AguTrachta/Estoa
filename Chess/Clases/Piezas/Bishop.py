@@ -1,9 +1,10 @@
 import pygame
 import os
+from Clases.Constantes import *
 
 class Bishop:
-    def __init__(self, color):
-        self.color = color
-        self.images_dir = os.path.join("Clases", "Imagenes")
-        self.image_white = pygame.image.load(os.path.join(self.images_dir, "white bishop.png"))
-        self.image_black = pygame.image.load(os.path.join(self.images_dir, "black bishop.png"))
+    def __init__(self, Square, image, color, type, row, col):
+        
+        Black_Bishop = pygame.transform.scale(pygame.image.load(os.path.join("Clases/Imagenes", "bB.png")), (Square, Square))
+        White_bishop = pygame.transform.scale(pygame.image.load(os.path.join("Clases/Imagenes", "wB.png")), (Square, Square))
+
