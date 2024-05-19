@@ -1,0 +1,103 @@
+@startuml
+
+class Game {
+  - Win
+  - Board
+  - Square
+  - selected
+  - turn
+  - valid_moves
+  - Black_pieces_left
+  - White_pieces_left
+  __init__(Width, Height, Rows, Cols, Square, Win)
+  update_window()
+  reset()
+  check_game()
+  enemies_moves(piece, Board)
+  get_King_pos(Board)
+  simulate_move(piece, row, col)
+  possible_moves(Board)
+  checkmate(Board)
+  change_turn()
+  select(row, col)
+  _move(row, col)
+  remove(board, piece, row, col)
+  draw_available_moves()
+  get_board()
+}
+
+class newBoard {
+  - Width
+  - Height
+  - Square
+  - GameBoard
+  - Win
+  - Rows
+  - Cols
+  - Board
+  __init__(Width, Height, Rows, Cols, Square, Win)
+  create_Board()
+  get_piece(row, col)
+  move(piece, row, col)
+  draw_Board()
+  draw_piece(piece, Win)
+  draw_pieces()
+}
+
+class Piece {
+  - Square
+  - image
+  - color
+  - row
+  - col
+  - type
+  - x
+  - y
+  - available_moves
+  __init__(Square, image, color, type, row, col)
+  piece_move(row, col)
+  calc_pos()
+  clear_available_moves()
+}
+
+class Pawn {
+  - first_move
+  __init__(Square, image, color, type, row, col)
+  get_available_moves(row, col, Board)
+}
+
+class Rook {
+  __init__(Square, image, color, type, row, col)
+  get_available_moves(row, col, Board)
+}
+
+class Bishop {
+  __init__(Square, image, color, type, row, col)
+  get_available_moves(row, col, Board)
+}
+
+class Knight {
+  __init__(Square, image, color, type, row, col)
+  get_available_moves(row, col, Board)
+}
+
+class Queen {
+  __init__(Square, image, color, type, row, col)
+  get_available_moves(row, col, Board)
+}
+
+class King {
+  __init__(Square, image, color, type, row, col)
+  get_available_moves(row, col, Board)
+}
+
+Game --> newBoard
+newBoard --> Piece
+Piece <|-- Pawn
+Piece <|-- Rook
+Piece <|-- Bishop
+Piece <|-- Knight
+Piece <|-- Queen
+Piece <|-- King
+
+@enduml
