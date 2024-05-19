@@ -80,6 +80,7 @@ class Pawn(Piece):
         return self.available_moves + self.capture_moves
 
 
+
 class Rook(Piece):
     def __init__(self, Square, image, color, type, row, col):
         super().__init__(Square, image, color, type, row, col)
