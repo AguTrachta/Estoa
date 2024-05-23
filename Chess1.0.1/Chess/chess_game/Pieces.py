@@ -1,8 +1,9 @@
 import pygame
 from .constants import *
+from abc import ABC, abstractmethod
 
 class Piece:
-    def __init__(self, Square, image, color, type, row, col):
+    def __init__(self, Square, image, color, type, row, col, move_strategy):
         self.Square = Square
         self.image = image
         self.color = color
@@ -15,6 +16,7 @@ class Piece:
         self.available_moves = []
         self.capture_moves = []  # Lista adicional para movimientos de captura
         self.calc_pos()
+        self.move_strategy = move_strategy
 
     def piece_move(self, row, col):
         self.row = row
@@ -30,12 +32,16 @@ class Piece:
             self.available_moves = []
         if len(self.capture_moves) > 0:
             self.capture_moves = []
+            
+    def get_available_moves(self, Board):
+        return self.move_strategy.get_available_moves(self, Board)
 
-class Pawn(Piece):
-    def __init__(self, Square, image, color, type, row, col):
-        super().__init__(Square, image, color, type, row, col)
-        self.first_move = True
+class MoveStrategy(ABC):
+    @abstractmethod
+    def get_available_moves(self,piece, Board):
+        pass
 
+class PawnMoveStrategy(MoveStrategy):   
     def get_available_moves(self, row, col, Board):
         self.clear_available_moves()
 
@@ -81,10 +87,7 @@ class Pawn(Piece):
 
 
 
-class Rook(Piece):
-    def __init__(self, Square, image, color, type, row, col):
-        super().__init__(Square, image, color, type, row, col)
-
+class RookMoveStrategy(MoveStrategy):
     def get_available_moves(self, row, col, Board):
         self.clear_available_moves()
         for i in range(row + 1, 8):
@@ -121,10 +124,7 @@ class Rook(Piece):
 
         return self.available_moves + self.capture_moves
 
-class Bishop(Piece):
-    def __init__(self, Square, image, color, type, row, col):
-        super().__init__(Square, image, color, type, row, col)
-
+class BishopMoveStrategy(MoveStrategy):
     def get_available_moves(self, row, col, Board):
         self.clear_available_moves()
 
@@ -178,10 +178,7 @@ class Bishop(Piece):
 
         return self.available_moves + self.capture_moves
 
-class Knight(Piece):
-    def __init__(self, Square, image, color, type, row, col):
-        super().__init__(Square, image, color, type, row, col)
-
+class KnightMoveStrategy(MoveStrategy):
     def get_available_moves(self, row, col, Board):
         self.clear_available_moves()
         directions = [
@@ -199,10 +196,7 @@ class Knight(Piece):
 
         return self.available_moves + self.capture_moves
 
-class Queen(Piece):
-    def __init__(self, Square, image, color, type, row, col):
-        super().__init__(Square, image, color, type, row, col)
-
+class QueenMoveStrategy(MoveStrategy):
     def get_available_moves(self, row, col, Board):
         self.clear_available_moves()
 
@@ -290,10 +284,7 @@ class Queen(Piece):
 
         return self.available_moves + self.capture_moves
 
-class King(Piece):
-    def __init__(self, Square, image, color, type, row, col):
-        super().__init__(Square, image, color, type, row, col)
-
+class KingMoveStrategy(MoveStrategy):
     def get_available_moves(self, row, col, Board):
         self.clear_available_moves()
         directions = [
@@ -310,3 +301,28 @@ class King(Piece):
                     self.capture_moves.append((r, c))
 
         return self.available_moves + self.capture_moves
+
+class Pawn(Piece):
+    def __init__(self, Square, image, color, type, row, col):
+        super().__init__(Square, image, color, type, row, col, PawnMoveStrategy())
+        self.first_move = True
+
+class Rook(Piece):
+    def __init__(self, Square, image, color, type, row, col):
+        super().__init__(Square, image, color, type, row, col, RookMoveStrategy())
+
+class Bishop(Piece):
+    def __init__(self, Square, image, color, type, row, col):
+        super().__init__(Square, image, color, type, row, col, BishopMoveStrategy())
+
+class Knight(Piece):
+    def __init__(self, Square, image, color, type, row, col):
+        super().__init__(Square, image, color, type, row, col, KnightMoveStrategy())
+
+class Queen(Piece):
+    def __init__(self, Square, image, color, type, row, col):
+        super().__init__(Square, image, color, type, row, col, QueenMoveStrategy())
+
+class King(Piece):
+    def __init__(self, Square, image, color, type, row, col):
+        super().__init__(Square, image, color, type, row, col, KingMoveStrategy())

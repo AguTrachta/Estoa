@@ -130,17 +130,17 @@ class Game:
             return False
 
         print(f"King position: {king_pos}")
-        get_king = Board.get_piece(king_pos[0], king_pos[1])
-        king_available_moves = set(get_king.get_available_moves(king_pos[0], king_pos[1], Board.Board))
-        enemies_moves_set = set(self.enemies_moves(get_king, Board.Board))
+        king_piece = Board.get_piece(king_pos[0], king_pos[1])  # Obtener la pieza del rey
+        king_available_moves = set(king_piece.get_available_moves(Board.Board))
+        enemies_moves_set = set(self.enemies_moves(king_piece, Board.Board))
 
         # Verificar si algún movimiento del rey lo pone fuera de peligro
         king_moves = set()
         for move in king_available_moves:
             temp_board = self.copy_board(Board.Board)
-            temp_board[get_king.row][get_king.col] = 0
-            temp_board[move[0]][move[1]] = get_king
-            if move not in self.enemies_moves(get_king, temp_board):
+            temp_board[king_piece.row][king_piece.col] = 0
+            temp_board[move[0]][move[1]] = king_piece
+            if move not in self.enemies_moves(king_piece, temp_board):
                 king_moves.add(move)
 
         if len(king_moves) > 0:
@@ -158,6 +158,7 @@ class Game:
 
         print(f"Checkmate detected for {'White' if self.turn == Black else 'Black'}")
         return True
+
 
     def copy_board(self, board):
         # Crear una copia manual del tablero sin superficies de Pygame
