@@ -310,3 +310,5 @@ class King(Piece):
                     self.capture_moves.append((r, c))
 
         return self.available_moves + self.capture_moves
+    
+    def class
