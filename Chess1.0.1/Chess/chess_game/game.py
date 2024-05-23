@@ -71,10 +71,11 @@ class Game:
             for c in range(len(Board[r])):
                 if Board[r][c] != 0:
                     if Board[r][c].color != piece.color:
-                        moves = Board[r][c].get_available_moves(r, c, Board)
+                        moves = Board[r][c].get_available_moves(Board)
                         for move in moves:
                             enemies_moves.append(move)
         return enemies_moves
+
 
     def get_King_pos(self, Board):
         for r in range(len(Board)):
@@ -118,7 +119,7 @@ class Game:
             for c in range(len(Board[r])):
                 if Board[r][c] != 0:
                     if Board[r][c].color == self.turn and Board[r][c].type != "King":
-                        moves = Board[r][c].get_available_moves(r, c, Board)
+                        moves = Board[r][c].get_available_moves(Board)
                         for move in moves:
                             possible_moves.append((r, c, move[0], move[1]))  # Include piece position and move position
         return possible_moves
@@ -190,7 +191,7 @@ class Game:
         piece = self.Board.get_piece(row, col)
         if piece != 0 and self.turn == piece.color:
             self.selected = piece
-            self.valid_moves = piece.get_available_moves(row, col, self.Board.Board)
+            self.valid_moves = piece.get_available_moves(self.Board.Board)
 
     def _move(self, row, col):
         piece = self.Board.get_piece(row, col)
