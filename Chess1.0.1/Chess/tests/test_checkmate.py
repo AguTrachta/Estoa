@@ -1,9 +1,13 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import unittest
 import pygame
-from ..chess_game.Pieces import King, Queen, Rook
-from ..chess_game.constants import White, Black
-from ..chess_game.game import Game
-from ..chess_game.board import newBoard
+from chess_game.Pieces import King, Queen, Rook
+from chess_game.constants import White, Black
+from chess_game.game import Game
+from chess_game.board import newBoard
 
 class TestCheckmate(unittest.TestCase):
     def setUp(self):
