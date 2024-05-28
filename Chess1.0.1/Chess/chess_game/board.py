@@ -58,14 +58,11 @@ class newBoard:
     def move(self, piece, row, col):
         self.Board[piece.row][piece.col], self.Board[row][col] = self.Board[row][col], self.Board[piece.row][piece.col]
         piece.piece_move(row, col)
+        piece.first_move = False  # Marcar que la pieza ha sido movida
 
         if piece.type == "Pawn":
             if (piece.color == White and row == 0) or (piece.color == Black and row == 7):
                 self.promotion_choice = piece  # Guardar el peón que debe ser promovido
-
-        if piece.type == "Pawn":
-            if piece.first_move:
-                piece.first_move = False
 
     def draw_Board(self):
         self.Win.fill(CustomBrown)

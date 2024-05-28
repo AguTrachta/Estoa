@@ -300,7 +300,41 @@ class KingMoveStrategy(MoveStrategy):
                 elif Board[r][c].color != piece.color:
                     piece.capture_moves.append((r, c))
 
+        # Verificar enroque
+        if piece.first_move and not self.is_in_check(piece, Board):
+            # Enroque corto
+            if col + 3 < 8 and isinstance(Board[row][col + 3], Rook) and Board[row][col + 3].first_move:
+                if all(Board[row][col + i] == 0 for i in range(1, 3)):
+                    if not self.is_in_check_path(piece, Board, [(row, col + 1), (row, col + 2)]):
+                        piece.available_moves.append((row, col + 2))
+
+            # Enroque largo
+            if col - 4 >= 0 and isinstance(Board[row][col - 4], Rook) and Board[row][col - 4].first_move:
+                if all(Board[row][col - i] == 0 for i in range(1, 4)):
+                    if not self.is_in_check_path(piece, Board, [(row, col - 1), (row, col - 2)]):
+                        piece.available_moves.append((row, col - 2))
+
         return piece.available_moves + piece.capture_moves
+
+    def is_in_check(self, piece, Board):
+        king_pos = (piece.row, piece.col)
+        enemies_moves = set(self.enemies_moves(piece, Board))
+        return king_pos in enemies_moves
+
+    def is_in_check_path(self, piece, Board, path):
+        enemies_moves = set(self.enemies_moves(piece, Board))
+        return any(pos in enemies_moves for pos in path)
+    
+    def enemies_moves(self, piece, Board):
+        enemies_moves = []
+        for r in range(len(Board)):
+            for c in range(len(Board[r])):
+                if Board[r][c] != 0 and Board[r][c].color != piece.color and Board[r][c].type != "King":
+                    moves = Board[r][c].move_strategy.get_available_moves(Board[r][c], Board)
+                    for move in moves:
+                        enemies_moves.append(move)
+        return enemies_moves
+
 
 
 
@@ -312,6 +346,7 @@ class Pawn(Piece):
 class Rook(Piece):
     def __init__(self, Square, image, color, type, row, col):
         super().__init__(Square, image, color, type, row, col, RookMoveStrategy())
+        self.first_move = True
 
 class Bishop(Piece):
     def __init__(self, Square, image, color, type, row, col):
@@ -328,3 +363,4 @@ class Queen(Piece):
 class King(Piece):
     def __init__(self, Square, image, color, type, row, col):
         super().__init__(Square, image, color, type, row, col, KingMoveStrategy())
+        self.first_move = True

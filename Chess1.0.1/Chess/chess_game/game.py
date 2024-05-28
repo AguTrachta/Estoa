@@ -198,14 +198,27 @@ class Game:
         if self.selected and (row, col) in self.valid_moves:
             if piece == 0 or piece.color != self.selected.color:
                 if self.simulate_move(self.selected, row, col):
-                    self.remove(self.Board.Board, piece, row, col)
-                    self.Board.move(self.selected, row, col)
+                    if self.selected.type == "King" and abs(self.selected.col - col) == 2:
+                        self.perform_castling(self.selected, row, col)
+                    else:
+                        self.remove(self.Board.Board, piece, row, col)
+                        self.Board.move(self.selected, row, col)
                     self.change_turn()
                     self.valid_moves = []
                     self.selected = None
                     return True
                 return False
         return False
+
+    def perform_castling(self, king, row, col):
+        if col == 6:  # Enroque corto
+            rook = self.Board.get_piece(row, col + 1)
+            self.Board.move(king, row, col)
+            self.Board.move(rook, row, col - 1)
+        elif col == 2:  # Enroque largo
+            rook = self.Board.get_piece(row, col - 2)
+            self.Board.move(king, row, col)
+            self.Board.move(rook, row, col + 1)
 
     def remove(self, board, piece, row, col):
         if piece != 0:
