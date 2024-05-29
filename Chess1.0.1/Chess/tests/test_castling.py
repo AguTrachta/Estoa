@@ -40,7 +40,7 @@ class TestCastling(unittest.TestCase):
         self.game.turn = White
 
         # Verificar enroque corto
-        available_moves_king = white_king.get_available_moves(self.game.Board.Board)
+        available_moves_king = white_king.move_strategy.get_available_moves(white_king, self.game.Board.Board)
         self.assertIn((7, 6), available_moves_king, "El enroque corto debería estar disponible")
         
         # Realizar el enroque corto
@@ -50,6 +50,10 @@ class TestCastling(unittest.TestCase):
         self.assertIsInstance(self.game.Board.Board[7][6], King, "El rey debería estar en la columna 6")
         self.assertIsInstance(self.game.Board.Board[7][5], Rook, "La torre debería estar en la columna 5")
 
+        #reseteo el tablero
+        white_king = King(self.Square, self.empty_surface, White, "King", 7, 4)
+        white_rook_king_side = Rook(self.Square, self.empty_surface, White, "Rook", 7, 7)
+
         # Reset the board for the next test
         self.game.Board.Board[7][4] = white_king
         self.game.Board.Board[7][7] = white_rook_king_side
@@ -57,7 +61,7 @@ class TestCastling(unittest.TestCase):
         self.game.Board.Board[7][5] = 0
 
         # Verificar enroque largo
-        available_moves_king = white_king.get_available_moves(self.game.Board.Board)
+        available_moves_king = white_king.move_strategy.get_available_moves(white_king, self.game.Board.Board)
         self.assertIn((7, 2), available_moves_king, "El enroque largo debería estar disponible")
 
         # Realizar el enroque largo

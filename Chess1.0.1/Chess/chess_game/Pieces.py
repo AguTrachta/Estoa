@@ -304,13 +304,13 @@ class KingMoveStrategy(MoveStrategy):
         if piece.first_move and not self.is_in_check(piece, Board):
             # Enroque corto
             if col + 3 < 8 and isinstance(Board[row][col + 3], Rook) and Board[row][col + 3].first_move:
-                if all(Board[row][col + i] == 0 for i in range(1, 3)):
+                if Board[row][col + 1] == 0 and Board[row][col + 2] == 0:
                     if not self.is_in_check_path(piece, Board, [(row, col + 1), (row, col + 2)]):
                         piece.available_moves.append((row, col + 2))  # Enroque corto
 
             # Enroque largo
             if col - 4 >= 0 and isinstance(Board[row][col - 4], Rook) and Board[row][col - 4].first_move:
-                if all(Board[row][col - i] == 0 for i in range(1, 4)):
+                if Board[row][col - 1] == 0 and Board[row][col - 2] == 0 and Board[row][col - 3] == 0:
                     if not self.is_in_check_path(piece, Board, [(row, col - 1), (row, col - 2)]):
                         piece.available_moves.append((row, col - 2))  # Enroque largo
 
@@ -364,3 +364,4 @@ class King(Piece):
     def __init__(self, Square, image, color, type, row, col):
         super().__init__(Square, image, color, type, row, col, KingMoveStrategy())
         self.first_move = True
+    
