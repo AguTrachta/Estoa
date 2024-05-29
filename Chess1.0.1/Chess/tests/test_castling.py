@@ -42,7 +42,7 @@ class TestCastling(unittest.TestCase):
         # Verificar enroque corto
         available_moves_king = white_king.move_strategy.get_available_moves(white_king, self.game.Board.Board)
         self.assertIn((7, 6), available_moves_king, "El enroque corto debería estar disponible")
-        
+        print("Enroque corto disponible")
         # Realizar el enroque corto
         self.game.Board.move(white_king, 7, 6)
         self.game.Board.move(white_rook_king_side, 7, 5)
@@ -63,7 +63,7 @@ class TestCastling(unittest.TestCase):
         # Verificar enroque largo
         available_moves_king = white_king.move_strategy.get_available_moves(white_king, self.game.Board.Board)
         self.assertIn((7, 2), available_moves_king, "El enroque largo debería estar disponible")
-
+        print("Enroque largo disponible")
         # Realizar el enroque largo
         self.game.Board.move(white_king, 7, 2)
         self.game.Board.move(white_rook_queen_side, 7, 3)
