@@ -232,17 +232,22 @@ class Game:
 
     def draw_available_moves(self):
         if self.selected is not None:
-            if len(self.selected.available_moves) > 0 or len(self.selected.capture_moves) > 0:
-                for pos in self.selected.available_moves:
-                    row, col = pos[0], pos[1]
-                    pygame.draw.circle(self.Win, Green,
-                                       (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                       self.Square // 8)
-                for pos in self.selected.capture_moves:
-                    row, col = pos[0], pos[1]
-                    pygame.draw.circle(self.Win, Red,
-                                       (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                       self.Square // 8)
+            for pos in self.selected.available_moves:
+                row, col = pos[0], pos[1]
+                # Verificar si el movimiento es un enroque
+                if self.selected.type == "King" and abs(self.selected.col - col) == 2:
+                    color = (0, 0, 255)  # Azul para el enroque
+                else:
+                    color = (0, 255, 0)  # Verde para otros movimientos
+
+                pygame.draw.circle(self.Win, color,
+                                   (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
+                                   self.Square // 8)
+            for pos in self.selected.capture_moves:
+                row, col = pos[0], pos[1]
+                pygame.draw.circle(self.Win, (255, 0, 0),
+                                   (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
+                                   self.Square // 8)
 
     def get_board(self):
         return self.board

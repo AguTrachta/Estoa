@@ -306,13 +306,13 @@ class KingMoveStrategy(MoveStrategy):
             if col + 3 < 8 and isinstance(Board[row][col + 3], Rook) and Board[row][col + 3].first_move:
                 if all(Board[row][col + i] == 0 for i in range(1, 3)):
                     if not self.is_in_check_path(piece, Board, [(row, col + 1), (row, col + 2)]):
-                        piece.available_moves.append((row, col + 2))
+                        piece.available_moves.append((row, col + 2))  # Enroque corto
 
             # Enroque largo
             if col - 4 >= 0 and isinstance(Board[row][col - 4], Rook) and Board[row][col - 4].first_move:
                 if all(Board[row][col - i] == 0 for i in range(1, 4)):
                     if not self.is_in_check_path(piece, Board, [(row, col - 1), (row, col - 2)]):
-                        piece.available_moves.append((row, col - 2))
+                        piece.available_moves.append((row, col - 2))  # Enroque largo
 
         return piece.available_moves + piece.capture_moves
 
