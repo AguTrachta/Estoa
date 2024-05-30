@@ -38,7 +38,7 @@ class TestCastling(unittest.TestCase):
 
         # Cambiar el turno a las blancas
         self.game.turn = White
-
+        print("----------------------------------------------------------------------")
         # Verificar enroque corto
         available_moves_king = white_king.move_strategy.get_available_moves(white_king, self.game.Board.Board)
         self.assertIn((7, 6), available_moves_king, "El enroque corto debería estar disponible")
