@@ -60,9 +60,12 @@ class newBoard:
         piece.piece_move(row, col)
         piece.first_move = False  # Marcar que la pieza ha sido movida
 
+        # Verificar si es un peón que llegó al final del tablero
         if piece.type == "Pawn":
             if (piece.color == White and row == 0) or (piece.color == Black and row == 7):
                 self.promotion_choice = piece  # Guardar el peón que debe ser promovido
+
+
 
     def draw_Board(self):
         self.Win.fill(CustomBrown)
@@ -74,6 +77,7 @@ class newBoard:
 
     def draw_piece(self, piece, Win):
         Win.blit(piece.image, (piece.x, piece.y))
+
 
     def draw_pieces(self):
         for row in range(self.Rows):
@@ -87,16 +91,12 @@ class newBoard:
             color = self.promotion_choice.color
 
             if choice == "Queen":
-                self.Board[row][col] = Queen(self.Square, White_Queen if color == White else Black_Queen, color,
-                                             "Queen", row, col)
+                self.Board[row][col] = Queen(self.Square, White_Queen if color == White else Black_Queen, color, "Queen", row, col)
             elif choice == "Rook":
-                self.Board[row][col] = Rook(self.Square, White_Rook if color == White else Black_Rook, color, "Rook",
-                                            row, col)
+                self.Board[row][col] = Rook(self.Square, White_Rook if color == White else Black_Rook, color, "Rook", row, col)
             elif choice == "Bishop":
-                self.Board[row][col] = Bishop(self.Square, White_Bishop if color == White else Black_Bishop, color,
-                                              "Bishop", row, col)
+                self.Board[row][col] = Bishop(self.Square, White_Bishop if color == White else Black_Bishop, color, "Bishop", row, col)
             elif choice == "Knight":
-                self.Board[row][col] = Knight(self.Square, White_Knight if color == White else Black_Knight, color,
-                                              "Knight", row, col)
+                self.Board[row][col] = Knight(self.Square, White_Knight if color == White else Black_Knight, color, "Knight", row, col)
 
             self.promotion_choice = None  # Reiniciar la opción de promoción
