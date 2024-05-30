@@ -193,32 +193,40 @@ class Game:
             self.selected = piece
             self.valid_moves = piece.get_available_moves(self.Board.Board)
 
+            print(f"Selected {piece.type} at ({row}, {col})")
+            print(f"Valid moves: {self.valid_moves}")
+
+
+
     def _move(self, row, col):
         piece = self.Board.get_piece(row, col)
         if self.selected and (row, col) in self.valid_moves:
             if piece == 0 or piece.color != self.selected.color:
-                if self.simulate_move(self.selected, row, col):
-                    if self.selected.type == "King" and abs(self.selected.col - col) == 2:
-                        self.perform_castling(self.selected, row, col)
-                    else:
+                if self.selected.type == "King" and abs(self.selected.col - col) == 2:
+                    # Enroque
+                    self.perform_castling(self.selected, row, col)
+                else:
+                    if self.simulate_move(self.selected, row, col):
                         self.remove(self.Board.Board, piece, row, col)
                         self.Board.move(self.selected, row, col)
-                    self.change_turn()
-                    self.valid_moves = []
-                    self.selected = None
-                    return True
-                return False
+                        self.change_turn()
+                        self.valid_moves = []
+                        self.selected = None
+                        return True
         return False
 
     def perform_castling(self, king, row, col):
         if col == 6:  # Enroque corto
-            rook = self.Board.get_piece(row, col + 1)
+            rook = self.Board.get_piece(row, 7)
             self.Board.move(king, row, col)
             self.Board.move(rook, row, col - 1)
         elif col == 2:  # Enroque largo
-            rook = self.Board.get_piece(row, col - 2)
+            rook = self.Board.get_piece(row, 0)
             self.Board.move(king, row, col)
             self.Board.move(rook, row, col + 1)
+        self.change_turn()
+        self.valid_moves = []
+        self.selected = None
 
     def remove(self, board, piece, row, col):
         if piece != 0:
@@ -241,13 +249,14 @@ class Game:
                     color = (0, 255, 0)  # Verde para otros movimientos
 
                 pygame.draw.circle(self.Win, color,
-                                   (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                   self.Square // 8)
+                                (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
+                                self.Square // 8)
             for pos in self.selected.capture_moves:
                 row, col = pos[0], pos[1]
                 pygame.draw.circle(self.Win, (255, 0, 0),
-                                   (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                   self.Square // 8)
+                                (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
+                                self.Square // 8)
+
 
     def get_board(self):
         return self.board
@@ -304,4 +313,4 @@ class Game:
     def handle_promotion(self, choice):
         if self.Board.promotion_choice:
             self.Board.promote_pawn(choice)
-            self.Board.promotion_choice = None
+            self.Board.promotion_choice = None  # Reiniciar la opción de promoción

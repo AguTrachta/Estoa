@@ -14,7 +14,7 @@ class Piece:
         self.y = 0
         self.image = image
         self.available_moves = []
-        self.capture_moves = []  # Lista adicional para movimientos de captura
+        self.capture_moves = []
         self.calc_pos()
         self.move_strategy = move_strategy
 
@@ -46,51 +46,42 @@ class PawnMoveStrategy(MoveStrategy):
         piece.clear_available_moves()
         row, col = piece.row, piece.col
 
-        # Trabaja para peones blancos
+        print(f"Calculating moves for Pawn at ({row}, {col})")
+
         if piece.color == White:
             if row - 1 >= 0:
                 if Board[row - 1][col] == 0:
                     piece.available_moves.append((row - 1, col))
-
                 if piece.first_move and row - 2 >= 0 and Board[row - 2][col] == 0:
                     piece.available_moves.append((row - 2, col))
-
-                if col - 1 >= 0 and Board[row - 1][col - 1] != 0:
-                    target_piece = Board[row - 1][col - 1]
-                    if target_piece.color != piece.color:
-                        piece.capture_moves.append((row - 1, col - 1))
-
-                if col + 1 < len(Board[0]) and Board[row - 1][col + 1] != 0:
-                    target_piece = Board[row - 1][col + 1]
-                    if target_piece.color != piece.color:
-                        piece.capture_moves.append((row - 1, col + 1))
-
-        # Trabaja para peones negros
+                if col - 1 >= 0 and Board[row - 1][col - 1] != 0 and Board[row - 1][col - 1].color != piece.color:
+                    piece.capture_moves.append((row - 1, col - 1))
+                if col + 1 < len(Board[0]) and Board[row - 1][col + 1] != 0 and Board[row - 1][col + 1].color != piece.color:
+                    piece.capture_moves.append((row - 1, col + 1))
+        
         if piece.color == Black:
             if row + 1 < len(Board):
                 if Board[row + 1][col] == 0:
                     piece.available_moves.append((row + 1, col))
-
                 if piece.first_move and row + 2 < len(Board) and Board[row + 2][col] == 0:
                     piece.available_moves.append((row + 2, col))
+                if col - 1 >= 0 and Board[row + 1][col - 1] != 0 and Board[row + 1][col - 1].color != piece.color:
+                    piece.capture_moves.append((row + 1, col - 1))
+                if col + 1 < len(Board[0]) and Board[row + 1][col + 1] != 0 and Board[row + 1][col + 1].color != piece.color:
+                    piece.capture_moves.append((row + 1, col + 1))
 
-                if col - 1 >= 0 and row + 1 < len(Board) and Board[row + 1][col - 1] != 0:
-                    target_piece = Board[row + 1][col - 1]
-                    if target_piece.color != piece.color:
-                        piece.capture_moves.append((row + 1, col - 1))
-
-                if col + 1 < len(Board[0]) and row + 1 < len(Board) and Board[row + 1][col + 1] != 0:
-                    target_piece = Board[row + 1][col + 1]
-                    if target_piece.color != piece.color:
-                        piece.capture_moves.append((row + 1, col + 1))
+        print(f"Available moves: {piece.available_moves}")
+        print(f"Capture moves: {piece.capture_moves}")
 
         return piece.available_moves + piece.capture_moves
+
 
 class RookMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
         piece.clear_available_moves()
         row, col = piece.row, piece.col
-        for i in range(row + 1, 8):
+
+        for i in range(row + 1, len(Board)):
             if Board[i][col] == 0:
                 piece.available_moves.append((i, col))
             else:
@@ -106,7 +97,7 @@ class RookMoveStrategy(MoveStrategy):
                     piece.capture_moves.append((i, col))
                 break
 
-        for i in range(col + 1, 8):
+        for i in range(col + 1, len(Board[0])):
             if Board[row][i] == 0:
                 piece.available_moves.append((row, i))
             else:
@@ -124,6 +115,8 @@ class RookMoveStrategy(MoveStrategy):
 
         return piece.available_moves + piece.capture_moves
 
+
+
 class BishopMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
         piece.clear_available_moves()
@@ -131,7 +124,7 @@ class BishopMoveStrategy(MoveStrategy):
 
         # Diagonal abajo-derecha
         row_i, col_i = row + 1, col + 1
-        while row_i < 8 and col_i < 8:
+        while row_i < len(Board) and col_i < len(Board[0]):
             if Board[row_i][col_i] == 0:
                 piece.available_moves.append((row_i, col_i))
             else:
@@ -155,7 +148,7 @@ class BishopMoveStrategy(MoveStrategy):
 
         # Diagonal arriba-derecha
         row_i, col_i = row - 1, col + 1
-        while row_i >= 0 and col_i < 8:
+        while row_i >= 0 and col_i < len(Board[0]):
             if Board[row_i][col_i] == 0:
                 piece.available_moves.append((row_i, col_i))
             else:
@@ -167,7 +160,7 @@ class BishopMoveStrategy(MoveStrategy):
 
         # Diagonal abajo-izquierda
         row_i, col_i = row + 1, col - 1
-        while row_i < 8 and col_i >= 0:
+        while row_i < len(Board) and col_i >= 0:
             if Board[row_i][col_i] == 0:
                 piece.available_moves.append((row_i, col_i))
             else:
@@ -188,15 +181,21 @@ class KnightMoveStrategy(MoveStrategy):
             (row + 2, col - 1), (row + 2, col + 1), (row + 1, col - 2), (row + 1, col + 2)
         ]
 
+        print(f"Calculating moves for Knight at ({row}, {col})")
+
         for move in moves:
             r, c = move
-            if 0 <= r < 8 and 0 <= c < 8:
+            if 0 <= r < len(Board) and 0 <= c < len(Board[0]):
                 if Board[r][c] == 0:
                     piece.available_moves.append((r, c))
                 elif Board[r][c].color != piece.color:
                     piece.capture_moves.append((r, c))
 
+        print(f"Available moves: {piece.available_moves}")
+        print(f"Capture moves: {piece.capture_moves}")
+
         return piece.available_moves + piece.capture_moves
+
 
 class QueenMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
