@@ -15,7 +15,7 @@ def get_positions(x, y):
 def main():
     run = True
     game_over = False
-    FPS = 60
+    FPS = 120
     game = Game(Width, Height, Rows, Cols, Square, Win)
 
     while run:
