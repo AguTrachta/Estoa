@@ -1,4 +1,4 @@
-@startuml class
+@startuml
 !define AbstractClass class
 
 class Game {
@@ -72,9 +72,6 @@ class QueenMoveStrategy {
 
 class KingMoveStrategy {
     +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
-    +is_in_check(piece: Piece, Board: List[List[Piece]]): bool
-    +is_in_check_path(piece: Piece, Board: List[List[Piece]], path: List[Tuple[int, int]]): bool
-    +enemies_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
 }
 
 class Pawn {
@@ -121,9 +118,9 @@ class Board {
     +promote_pawn(choice: str): void
 }
 
-Game -> Board
-Game -> Piece
-Piece -> MoveStrategy
+Game --> Board
+Game --> Piece
+Piece --> MoveStrategy
 MoveStrategy <|-- PawnMoveStrategy
 MoveStrategy <|-- RookMoveStrategy
 MoveStrategy <|-- BishopMoveStrategy
