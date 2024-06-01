@@ -1,7 +1,7 @@
 # game.py
 
 import pygame
-from .board import newBoard
+from chess_game.board import newBoard
 from .constants import *
 from copy import deepcopy
 

@@ -2,9 +2,12 @@ import os
 import pygame
 
 # Definir constantes
-Width, Height = 680, 680
+label_space=50
 Rows, Cols = 8, 8
-Square = Width // Cols
+Square = 80
+Width = Cols * Square + 2 * label_space
+Height = Rows * Square + 2 * label_space
+
 
 # Definir colores
 White = (255, 255, 255)

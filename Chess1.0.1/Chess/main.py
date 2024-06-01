@@ -8,8 +8,8 @@ clock = pygame.time.Clock()
 Win = pygame.display.set_mode((Width, Height))
 
 def get_positions(x, y):
-    row = y // Square
-    col = x // Square
+    row = (y - label_space) // Square
+    col = (x - label_space) // Square
     return row, col
 
 def main():
@@ -38,7 +38,7 @@ def main():
                 if game.Board.promotion_choice:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     # Definir las áreas de clic para cada opción
-                    if Width // 2 - 100 < mouse_x < Width // 2 + 100:
+                    if Width // 2 - 100 < mouse_x < Width // 2 + 50:
                         if Height // 2 - 100 < mouse_y < Height // 2 - 50:
                             game.handle_promotion("Queen")
                         elif Height // 2 - 50 < mouse_y < Height // 2:
