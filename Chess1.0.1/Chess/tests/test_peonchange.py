@@ -14,10 +14,10 @@ class TestPawnPromotion(unittest.TestCase):
         self.game = Game(680, 680, 8, 8, 680 // 8, None)
 
     def test_pawn_promotion_1(self):
-        self.game.Board.Board[0][0] = Pawn(680 // 8, None, White, "Pawn", 0, 0)
-        self.game.Board.promotion_choice = self.game.Board.Board[0][0]
-        self.game.handle_promotion("Queen")
-        self.assertIsInstance(self.game.Board.get_piece(0, 0), Queen)
+        self.game.Board.Board[0][0] = Pawn(680 // 8, None, White, "Pawn", 0, 0) #Ubico peon en 'a8'
+        self.game.Board.promotion_choice = self.game.Board.Board[0][0] #Panel de eleccion de piezas a transformar
+        self.game.handle_promotion("Queen") #Transformo en reina
+        self.assertIsInstance(self.game.Board.get_piece(0, 0), Queen) #Aseguro que exista una reina en 'a8' 
         print("----------------------------------------------------------------------")
         print("El peon blanco en 'a8' se convirtio en Reina")
         

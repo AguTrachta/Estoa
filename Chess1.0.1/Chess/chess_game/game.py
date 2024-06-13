@@ -198,6 +198,7 @@ class Game:
 
 
 
+
     def _move(self, row, col):
         piece = self.Board.get_piece(row, col)
         if self.selected and (row, col) in self.valid_moves:
@@ -240,7 +241,7 @@ class Game:
 
     def draw_available_moves(self):
         if self.selected is not None:
-            for pos in self.selected.available_moves:
+            for pos in self.valid_moves:  # Cambiado de self.selected.available_moves a self.valid_moves
                 row, col = pos[0], pos[1]
                 # Verificar si el movimiento es un enroque
                 if self.selected.type == "King" and abs(self.selected.col - col) == 2:
@@ -251,12 +252,6 @@ class Game:
                 pygame.draw.circle(self.Win, color,
                                 (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
                                 self.Square // 8)
-            for pos in self.selected.capture_moves:
-                row, col = pos[0], pos[1]
-                pygame.draw.circle(self.Win, (255, 0, 0),
-                                (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                self.Square // 8)
-
 
     def get_board(self):
         return self.board
