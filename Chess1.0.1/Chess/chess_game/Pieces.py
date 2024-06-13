@@ -41,7 +41,7 @@ class MoveStrategy(ABC):
     def get_available_moves(self, piece, Board):
         pass
 
-class PawnMoveStrategy(MoveStrategy):   
+class PawnMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
         piece.clear_available_moves()
         row, col = piece.row, piece.col
@@ -52,19 +52,19 @@ class PawnMoveStrategy(MoveStrategy):
             if row - 1 >= 0:
                 if Board[row - 1][col] == 0:
                     piece.available_moves.append((row - 1, col))
-                if piece.first_move and row - 2 >= 0 and Board[row - 2][col] == 0:
-                    piece.available_moves.append((row - 2, col))
+                    if piece.first_move and row - 2 >= 0 and Board[row - 2][col] == 0:
+                        piece.available_moves.append((row - 2, col))
                 if col - 1 >= 0 and Board[row - 1][col - 1] != 0 and Board[row - 1][col - 1].color != piece.color:
                     piece.capture_moves.append((row - 1, col - 1))
                 if col + 1 < len(Board[0]) and Board[row - 1][col + 1] != 0 and Board[row - 1][col + 1].color != piece.color:
                     piece.capture_moves.append((row - 1, col + 1))
-        
+
         if piece.color == Black:
             if row + 1 < len(Board):
                 if Board[row + 1][col] == 0:
                     piece.available_moves.append((row + 1, col))
-                if piece.first_move and row + 2 < len(Board) and Board[row + 2][col] == 0:
-                    piece.available_moves.append((row + 2, col))
+                    if piece.first_move and row + 2 < len(Board) and Board[row + 2][col] == 0:
+                        piece.available_moves.append((row + 2, col))
                 if col - 1 >= 0 and Board[row + 1][col - 1] != 0 and Board[row + 1][col - 1].color != piece.color:
                     piece.capture_moves.append((row + 1, col - 1))
                 if col + 1 < len(Board[0]) and Board[row + 1][col + 1] != 0 and Board[row + 1][col + 1].color != piece.color:
@@ -181,7 +181,7 @@ class KnightMoveStrategy(MoveStrategy):
             (row + 2, col - 1), (row + 2, col + 1), (row + 1, col - 2), (row + 1, col + 2)
         ]
 
-        print(f"Calculating moves for Knight at ({row}, {col})")
+        #print(f"Calculating moves for Knight at ({row}, {col})")
 
         for move in moves:
             r, c = move
@@ -191,8 +191,8 @@ class KnightMoveStrategy(MoveStrategy):
                 elif Board[r][c].color != piece.color:
                     piece.capture_moves.append((r, c))
 
-        print(f"Available moves: {piece.available_moves}")
-        print(f"Capture moves: {piece.capture_moves}")
+        #print(f"Available moves: {piece.available_moves}")
+        #print(f"Capture moves: {piece.capture_moves}")
 
         return piece.available_moves + piece.capture_moves
 

@@ -41,18 +41,19 @@ class Game:
         self.Black_pieces_left = 16
         self.White_pieces_left = 16
         print("Game reset")
-
     def check_game(self):
         if self.Black_pieces_left == 0:
             self.game_over = True
             self.winner = "Whites win"
             print("Game Over: Whites win")
+            self.update_window()  # Llamada explícita aquí
             return True
 
         if self.White_pieces_left == 0:
             self.game_over = True
             self.winner = "Blacks win"
             print("Game Over: Blacks win")
+            self.update_window()  # Llamada explícita aquí
             return True
 
         if self.checkmate(self.Board):
@@ -62,6 +63,7 @@ class Game:
             else:
                 self.winner = "White wins"
             print(f"Game Over: {self.winner}")
+            self.update_window()  # Llamada explícita aquí
             return True
         return False
 
@@ -99,8 +101,11 @@ class Game:
         # Verificar si el rey está en jaque después del movimiento
         king_pos = self.get_King_pos(self.Board.Board)
         if king_pos:
+            #print(f"Posición del rey: {king_pos}")
             enemy_moves = self.enemies_moves(piece, self.Board.Board)
+            #print(f"Movimientos enemigos: {enemy_moves}")
             if king_pos in enemy_moves:
+                print(f"El rey está en jaque después del movimiento: {piece} a ({row}, {col})")
                 # Restaurar el estado del tablero si el movimiento pone al rey en jaque
                 piece.row, piece.col = piece_row, piece_col
                 self.Board.Board[row][col] = target_piece
@@ -112,6 +117,8 @@ class Game:
         self.Board.Board[row][col] = target_piece
         self.Board.Board[piece_row][piece_col] = piece
         return True
+
+
 
     def possible_moves(self, Board):
         possible_moves = []
@@ -196,8 +203,6 @@ class Game:
             print(f"Selected {piece.type} at ({row}, {col})")
             print(f"Valid moves: {self.valid_moves}")
 
-
-
     def _move(self, row, col):
         piece = self.Board.get_piece(row, col)
         if self.selected and (row, col) in self.valid_moves:
@@ -240,7 +245,7 @@ class Game:
 
     def draw_available_moves(self):
         if self.selected is not None:
-            for pos in self.selected.available_moves:
+            for pos in self.valid_moves:  # Cambiado de self.selected.available_moves a self.valid_moves
                 row, col = pos[0], pos[1]
                 # Verificar si el movimiento es un enroque
                 if self.selected.type == "King" and abs(self.selected.col - col) == 2:
@@ -251,12 +256,6 @@ class Game:
                 pygame.draw.circle(self.Win, color,
                                 (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
                                 self.Square // 8)
-            for pos in self.selected.capture_moves:
-                row, col = pos[0], pos[1]
-                pygame.draw.circle(self.Win, (255, 0, 0),
-                                (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                self.Square // 8)
-
 
     def get_board(self):
         return self.board
