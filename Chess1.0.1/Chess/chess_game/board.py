@@ -70,10 +70,22 @@ class newBoard:
     def draw_Board(self):
         self.Win.fill(CustomBrown)
 
+        font = pygame.font.SysFont(None, 24)
+        
         for row in range(self.Rows):
-            for col in range(row % 2, self.Cols, 2):
-                pygame.draw.rect(self.Win, CustomBeige,
-                                 (col * self.Square, row * self.Square, self.Square, self.Square))
+            for col in range(self.Cols):
+                color = CustomBeige if (row + col) % 2 == 0 else CustomBrown
+                pygame.draw.rect(self.Win, color, (col * self.Square, row * self.Square, self.Square, self.Square))
+
+                # Dibujar los números en las filas
+                if col == 0:
+                    text = font.render(str(8 - row), True, pygame.Color('gray51'))
+                    self.Win.blit(text, (col * self.Square + 5, row * self.Square + 5))
+
+                # Dibujar las letras en las columnas
+                if row == 7:
+                    text = font.render(chr(97 + col), True, pygame.Color('gray51'))
+                    self.Win.blit(text, ((col + 1) * self.Square - 20, (row + 1) * self.Square - 20))
 
     def draw_piece(self, piece, Win):
         Win.blit(piece.image, (piece.x, piece.y))
