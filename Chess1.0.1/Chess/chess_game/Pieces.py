@@ -197,6 +197,7 @@ class KnightMoveStrategy(MoveStrategy):
         return piece.available_moves + piece.capture_moves
 
 
+
 class QueenMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
         piece.clear_available_moves()

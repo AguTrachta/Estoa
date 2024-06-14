@@ -1,6 +1,3 @@
-# board.py
-
-
 from .Pieces import *
 from .constants import *
 import pygame
@@ -65,13 +62,12 @@ class newBoard:
             if (piece.color == White and row == 0) or (piece.color == Black and row == 7):
                 self.promotion_choice = piece  # Guardar el peón que debe ser promovido
 
-
-
     def draw_Board(self):
         self.Win.fill(CustomBrown)
 
         font = pygame.font.SysFont(None, 24)
-        
+        dark_gray = pygame.Color('gray40')
+
         for row in range(self.Rows):
             for col in range(self.Cols):
                 color = CustomBeige if (row + col) % 2 == 0 else CustomBrown
@@ -79,17 +75,16 @@ class newBoard:
 
                 # Dibujar los números en las filas
                 if col == 0:
-                    text = font.render(str(8 - row), True, pygame.Color('gray51'))
+                    text = font.render(str(8 - row), True, dark_gray)
                     self.Win.blit(text, (col * self.Square + 5, row * self.Square + 5))
 
                 # Dibujar las letras en las columnas
                 if row == 7:
-                    text = font.render(chr(97 + col), True, pygame.Color('gray51'))
+                    text = font.render(chr(97 + col), True, dark_gray)
                     self.Win.blit(text, ((col + 1) * self.Square - 20, (row + 1) * self.Square - 20))
 
     def draw_piece(self, piece, Win):
         Win.blit(piece.image, (piece.x, piece.y))
-
 
     def draw_pieces(self):
         for row in range(self.Rows):
