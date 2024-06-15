@@ -18,6 +18,5 @@ jobs:
 
       - name: Run unit tests with unittest
         run: |
-          cd Estoa/Chess1.0.1/Chess 
           python -m unittest discover -s tests -p 'utest_*.py'
 
