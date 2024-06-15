@@ -16,43 +16,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Miniconda
+      - name: Install and setup Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: 'latest'
           python-version: '3.10'
-          activate-environment: 'chess-env'
+          activate-environment: chess-env
 
-      - name: Install Pygame and flake8 (within Conda environment)
+      - name: Install dependencies
         run: |
           conda install -c conda-forge pygame flake8
 
-      - name: Verify flake8 installation
-        run: |
-          source $(conda info --base)/condabin/activate chess-env
-          flake8 --version
-
       - name: Lint with flake8
         run: |
-          source $(conda info --base)/condabin/activate chess-env
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run unit tests with unittest
         run: |
-          source $(conda info --base)/condabin/activate chess-env
           cd Chess1.0.1/Chess
           python -m unittest discover -s tests -p 'utest_*.py'
-
-      - name: Save test output
-        run: |
-          source $(conda info --base)/condabin/activate chess-env
-          python -m unittest discover -s tests -p 'utest_*.py' > tests/output.txt
-
-      - name: Check for errors in test output
-        run: |
-          if [ -z "$(grep -E 'ERROR|FAILED' < tests/output.txt)" ]; then
-            echo "Tests passed without errors"
-          else
-            exit 1
-          fi
