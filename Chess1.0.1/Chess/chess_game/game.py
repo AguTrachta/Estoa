@@ -74,6 +74,13 @@ class Game:
             print(f"Game Over: {self.winner}")
             self.update_window()
             return True
+        
+        if self.is_insufficient_material():
+            self.game_over = True
+            self.winner = "Draw - Insufficient Material"
+            print("Game Over: Draw - Insufficient Material")
+            self.update_window()
+            return True
 
         return False
 
@@ -183,6 +190,35 @@ class Game:
 
         print("Stalemate detected")
         return True
+    
+    def is_insufficient_material(self):
+        piece_count = {
+            White: {"King": 0, "Queen": 0, "Rook": 0, "Bishop": 0, "Knight": 0, "Pawn": 0},
+            Black: {"King": 0, "Queen": 0, "Rook": 0, "Bishop": 0, "Knight": 0, "Pawn": 0},
+        }
+
+        # Contar el número de piezas restantes en el tablero
+        for r in range(len(self.Board.Board)):
+            for c in range(len(self.Board.Board[r])):
+                piece = self.Board.get_piece(r, c)
+                if piece != 0:
+                    piece_count[piece.color][piece.type] += 1
+
+        # Verificar condiciones de insuficiencia de material
+        if (piece_count[White]["King"] == 1 and piece_count[Black]["King"] == 1 and
+                piece_count[Black]["Queen"] == 0 and piece_count[Black]["Rook"] == 0 and
+                piece_count[Black]["Bishop"] == 0 and piece_count[Black]["Knight"] == 0 and
+                piece_count[Black]["Pawn"] == 0):
+            return True
+
+        if (piece_count[White]["King"] == 1 and piece_count[White]["Knight"] == 1 and
+                piece_count[Black]["King"] == 1 and
+                piece_count[Black]["Queen"] == 0 and piece_count[Black]["Rook"] == 0 and
+                piece_count[Black]["Bishop"] == 0 and piece_count[Black]["Knight"] == 1 and
+                piece_count[Black]["Pawn"] == 0):
+            return True
+
+        return False
 
     def checkmate(self, Board):
         king_pos = self.get_King_pos(Board.Board)
