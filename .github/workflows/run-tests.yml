@@ -42,4 +42,4 @@ jobs:
         cd Chess1.0.1/Chess/tests
         # Ajusta el comando de acuerdo a tu entorno y lenguaje de programación
         # Por ejemplo, para Python y pytest:
-        python -m unittest discover -s tests -p 'utest_*.py'
+        pytest
