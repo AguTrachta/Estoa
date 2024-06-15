@@ -1,0 +1,5 @@
+# Mis dependencias para el proyecto
+flask==2.0.1
+requests==2.26.0
+# Biblioteca para testing
+pytest==6.2.4
