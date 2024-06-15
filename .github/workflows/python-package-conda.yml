@@ -21,7 +21,8 @@ jobs:
 
       - name: Add Conda Environment PATH (Optional)
         run: |
-        echo "source /usr/share/miniconda3/bin/activate chess-env" >> $GITHUB_PATH  # Replace with your environment activation command
+          echo "source /usr/share/miniconda3/bin/activate chess-env" >> $GITHUB_PATH  # Replace with your environment activation command
+
 
       - name: Lint with flake8
         run: |
