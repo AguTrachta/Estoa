@@ -1,13 +1,20 @@
 name: Python Package using Conda
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main  # Cambia esto al nombre de tu rama principal si es diferente
+  pull_request:
+    branches:
+      - main  # Cambia esto al nombre de tu rama principal si es diferente
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install Miniconda
         uses: conda-incubator/setup-miniconda@v2
@@ -16,13 +23,13 @@ jobs:
           python-version: '3.10'
           activate-environment: 'chess-env'
 
-      - name: Install Pygame (within Conda environment)
-        run: conda install -c conda-forge pygame
-
-      - name: Add Conda Environment PATH (Optional)
+      - name: Install Pygame and flake8 (within Conda environment)
         run: |
-          echo "source /usr/share/miniconda3/bin/activate chess-env" >> $GITHUB_PATH  # Replace with your environment activation command
+          conda install -c conda-forge pygame flake8
 
+      - name: Verify flake8 installation
+        run: |
+          flake8 --version
 
       - name: Lint with flake8
         run: |
@@ -34,8 +41,14 @@ jobs:
           cd Chess1.0.1/Chess
           python -m unittest discover -s tests -p 'utest_*.py'
 
-      - name: Check for errors in test output
-        run: if [ -z "$(grep -E 'ERROR|FAILED' < tests/output.txt)" ]; then echo "Tests passed without errors"; else exit 1; fi
-
       - name: Save test output
-        run: python -m unittest discover -s tests -p 'utest_*.py' > tests/output.txt
+        run: |
+          python -m unittest discover -s tests -p 'utest_*.py' > tests/output.txt
+
+      - name: Check for errors in test output
+        run: |
+          if [ -z "$(grep -E 'ERROR|FAILED' < tests/output.txt)" ]; then
+            echo "Tests passed without errors"
+          else
+            exit 1
+          fi
