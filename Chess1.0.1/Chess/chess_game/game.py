@@ -20,6 +20,7 @@ class Game:
         self.White_pieces_left = 16
         self.game_over = False
         self.winner = None
+        
 
     def update_window(self):
         self.Board.draw_Board()
@@ -41,19 +42,27 @@ class Game:
         self.Black_pieces_left = 16
         self.White_pieces_left = 16
         print("Game reset")
+        
     def check_game(self):
         if self.Black_pieces_left == 0:
             self.game_over = True
             self.winner = "Whites win"
             print("Game Over: Whites win")
-            self.update_window()  # Llamada explícita aquí
+            self.update_window()
             return True
 
         if self.White_pieces_left == 0:
             self.game_over = True
             self.winner = "Blacks win"
             print("Game Over: Blacks win")
-            self.update_window()  # Llamada explícita aquí
+            self.update_window()
+            return True
+
+        if self.is_stalemate(self.Board):  # Verificación de ahogado
+            self.game_over = True
+            self.winner = "Stalemate - Draw"
+            print("Game Over: Stalemate")
+            self.update_window()
             return True
 
         if self.checkmate(self.Board):
@@ -63,9 +72,11 @@ class Game:
             else:
                 self.winner = "White wins"
             print(f"Game Over: {self.winner}")
-            self.update_window()  # Llamada explícita aquí
+            self.update_window()
             return True
+
         return False
+
 
     def enemies_moves(self, piece, Board):
         enemies_moves = []
@@ -131,6 +142,48 @@ class Game:
                             possible_moves.append((r, c, move[0], move[1]))  # Include piece position and move position
         return possible_moves
 
+    def is_stalemate(self, Board):
+        king_pos = self.get_King_pos(Board.Board)
+        if not king_pos:
+            print("No king found")
+            return False
+
+        king_piece = Board.get_piece(king_pos[0], king_pos[1])
+        king_available_moves = set(king_piece.get_available_moves(Board.Board))
+        enemies_moves_set = set(self.enemies_moves(king_piece, Board.Board))
+
+        # Verificar si el rey está en jaque
+        king_in_check = king_pos in enemies_moves_set
+
+        if king_in_check:
+            return False  # No es ahogado si el rey está en jaque
+
+        # Verificar si el rey tiene movimientos legales
+        king_safe_moves = set()
+        for move in king_available_moves:
+            temp_board = self.copy_board(Board.Board)
+            temp_board[king_piece.row][king_piece.col] = 0
+            temp_board[move[0]][move[1]] = king_piece
+            if move not in self.enemies_moves(king_piece, temp_board):
+                king_safe_moves.add(move)
+
+        if len(king_safe_moves) > 0:
+            print(f"King has safe moves: {king_safe_moves}")
+            return False  # No es ahogado si el rey tiene movimientos seguros
+
+        # Verificar si el jugador tiene movimientos legales
+        all_possible_moves = self.possible_moves(Board.Board)
+        for move in all_possible_moves:
+            r, c, move_r, move_c = move
+            piece = Board.get_piece(r, c)
+            if piece.color == self.turn:
+                if self.simulate_move(piece, move_r, move_c):
+                    print(f"Move {move} is a legal move")
+                    return False  # No es ahogado si alguna pieza tiene movimientos legales
+
+        print("Stalemate detected")
+        return True
+
     def checkmate(self, Board):
         king_pos = self.get_King_pos(Board.Board)
         if not king_pos:
@@ -138,21 +191,29 @@ class Game:
             return False
 
         print(f"King position: {king_pos}")
-        king_piece = Board.get_piece(king_pos[0], king_pos[1])  # Obtener la pieza del rey
+        king_piece = Board.get_piece(king_pos[0], king_pos[1])
         king_available_moves = set(king_piece.get_available_moves(Board.Board))
         enemies_moves_set = set(self.enemies_moves(king_piece, Board.Board))
 
+        # Verificar si el rey está en jaque
+        if king_pos in enemies_moves_set:
+            print(f"King is in check at position: {king_pos}")
+            king_in_check = True
+        else:
+            print(f"King is not in check at position: {king_pos}")
+            king_in_check = False
+
         # Verificar si algún movimiento del rey lo pone fuera de peligro
-        king_moves = set()
+        king_safe_moves = set()
         for move in king_available_moves:
             temp_board = self.copy_board(Board.Board)
             temp_board[king_piece.row][king_piece.col] = 0
             temp_board[move[0]][move[1]] = king_piece
             if move not in self.enemies_moves(king_piece, temp_board):
-                king_moves.add(move)
+                king_safe_moves.add(move)
 
-        if len(king_moves) > 0:
-            print(f"King has safe moves: {king_moves}")
+        if len(king_safe_moves) > 0:
+            print(f"King has safe moves: {king_safe_moves}")
             return False
 
         # Verificar si alguna pieza puede bloquear el jaque o capturar la pieza atacante
@@ -164,8 +225,12 @@ class Game:
                 print(f"Move {move} can block the check")
                 return False
 
-        print(f"Checkmate detected for {'White' if self.turn == Black else 'Black'}")
-        return True
+        if king_in_check:
+            print(f"Checkmate detected for {'White' if self.turn == Black else 'Black'}")
+            return True
+        else:
+            print(f"Stalemate detected for {'White' if self.turn == Black else 'Black'}")
+            return False
 
 
     def copy_board(self, board):
@@ -202,9 +267,6 @@ class Game:
 
             print(f"Selected {piece.type} at ({row}, {col})")
             print(f"Valid moves: {self.valid_moves}")
-
-
-
 
     def _move(self, row, col):
         piece = self.Board.get_piece(row, col)
