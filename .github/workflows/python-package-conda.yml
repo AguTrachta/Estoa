@@ -19,9 +19,9 @@ jobs:
       - name: Install Pygame (within Conda environment)
         run: conda install -c conda-forge pygame
 
-      - name: Add Conda Environment PATH (Permanent)
+      - name: Add Conda Environment PATH (Optional)
         run: |
-          echo "source /usr/share/miniconda3/bin/activate chess-env" >> $GITHUB_PATH
+        echo "source /usr/share/miniconda3/bin/activate chess-env" >> $GITHUB_PATH  # Replace with your environment activation command
 
       - name: Lint with flake8
         run: |
