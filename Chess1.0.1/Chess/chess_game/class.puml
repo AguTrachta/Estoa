@@ -1,0 +1,136 @@
+@startuml
+!define AbstractClass class
+
+class Game {
+    -Width: int
+    -Height: int
+    -Win: pygame.Surface
+    -Board: Board
+    -Square: int
+    -selected: Piece
+    -turn: Tuple[int, int, int]
+    -valid_moves: List[Tuple[int, int]]
+    -Black_pieces_left: int
+    -White_pieces_left: int
+    -game_over: bool
+    -winner: str
+    +__init__(Width: int, Height: int, Rows: int, Cols: int, Square: int, Win: pygame.Surface)
+    +update_window(): void
+    +reset(): void
+    +check_game(): bool
+    +select(row: int, col: int): void
+    +_move(row: int, col: int): bool
+    +remove(board: List[List[Piece]], piece: Piece, row: int, col: int): void
+    +draw_available_moves(): void
+    +show_winner(): void
+    +show_promotion_choices(): void
+    +handle_promotion(choice: str): void
+}
+
+class Piece {
+    -Square: int
+    -image: pygame.Surface
+    -color: Tuple[int, int, int]
+    -row: int
+    -col: int
+    -type: str
+    -x: int
+    -y: int
+    -available_moves: List[Tuple[int, int]]
+    -capture_moves: List[Tuple[int, int]]
+    -move_strategy: MoveStrategy
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int, move_strategy: MoveStrategy)
+    +piece_move(row: int, col: int): void
+    +calc_pos(): void
+    +clear_available_moves(): void
+    +get_available_moves(Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+AbstractClass MoveStrategy {
+    {abstract} +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class PawnMoveStrategy {
+    +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class RookMoveStrategy {
+    +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class BishopMoveStrategy {
+    +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class KnightMoveStrategy {
+    +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class QueenMoveStrategy {
+    +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class KingMoveStrategy {
+    +get_available_moves(piece: Piece, Board: List[List[Piece]]): List[Tuple[int, int]]
+}
+
+class Pawn {
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int)
+}
+
+class Rook {
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int)
+}
+
+class Bishop {
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int)
+}
+
+class Knight {
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int)
+}
+
+class Queen {
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int)
+}
+
+class King {
+    +__init__(Square: int, image: pygame.Surface, color: Tuple[int, int, int], type: str, row: int, col: int)
+}
+
+class Board {
+    -Width: int
+    -Height: int
+    -Square: int
+    -GameBoard: int
+    -Win: pygame.Surface
+    -Rows: int
+    -Cols: int
+    -Board: List[List[Piece]]
+    -promotion_choice: Piece
+    +__init__(Width: int, Height: int, Rows: int, Cols: int, Square: int, Win: pygame.Surface)
+    +create_Board(): void
+    +get_piece(row: int, col: int): Piece
+    +move(piece: Piece, row: int, col: int): void
+    +draw_Board(): void
+    +draw_piece(piece: Piece, Win: pygame.Surface): void
+    +draw_pieces(): void
+    +promote_pawn(choice: str): void
+}
+
+Game --> Board
+Game --> Piece
+Piece --> MoveStrategy
+MoveStrategy <|-- PawnMoveStrategy
+MoveStrategy <|-- RookMoveStrategy
+MoveStrategy <|-- BishopMoveStrategy
+MoveStrategy <|-- KnightMoveStrategy
+MoveStrategy <|-- QueenMoveStrategy
+MoveStrategy <|-- KingMoveStrategy
+Piece <|-- Pawn
+Piece <|-- Rook
+Piece <|-- Bishop
+Piece <|-- Knight
+Piece <|-- Queen
+Piece <|-- King
+@enduml
