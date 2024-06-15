@@ -1,0 +1,11 @@
+name: chess-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pytest
+  - flake8
+  - numpy
+  - pip
+  - pip:
+      - chess  # Ejemplo de dependencia de PyPI
