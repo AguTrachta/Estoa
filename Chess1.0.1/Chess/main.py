@@ -1,11 +1,13 @@
 import pygame
+from chess_game.controller import GameController
 from chess_game.constants import *
-from chess_game.game import Game
 
 pygame.init()
 clock = pygame.time.Clock()
 
-Win = pygame.display.set_mode((Width, Height))
+# Aumentar la pantalla para acomodar los temporizadores
+Width, Height = 800, 680  # Ajusta el tamaño según sea necesario
+Win = pygame.display.set_mode((Width + 200, Height))
 
 def get_positions(x, y):
     row = y // Square
@@ -16,44 +18,44 @@ def main():
     run = True
     game_over = False
     FPS = 120
-    game = Game(Width, Height, Rows, Cols, Square, Win)
+    game_controller = GameController(Width, Height, Rows, Cols, Square, Win)
 
     while run:
         clock.tick(FPS)
-        game.update_window()
-        if game.check_game():
-            game_over = True
+        play_rect, quit_rect = game_controller.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
                 quit()
 
             if event.type == pygame.KEYDOWN and game_over:
                 if event.key == pygame.K_SPACE:
-                    game.reset()
+                    game_controller.reset()
                     game_over = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
-                if game.Board.promotion_choice:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    # Definir las áreas de clic para cada opción
-                    if Width // 2 - 100 < mouse_x < Width // 2 + 100:
-                        if Height // 2 - 100 < mouse_y < Height // 2 - 50:
-                            game.handle_promotion("Queen")
-                        elif Height // 2 - 50 < mouse_y < Height // 2:
-                            game.handle_promotion("Rook")
-                        elif Height // 2 < mouse_y < Height // 2 + 50:
-                            game.handle_promotion("Bishop")
-                        elif Height // 2 + 50 < mouse_y < Height // 2 + 100:
-                            game.handle_promotion("Knight")
-                else:
-                    if pygame.mouse.get_pressed()[0]:
-                        location = pygame.mouse.get_pos()
-                        row, col = get_positions(location[0], location[1])
-                        game.select(row, col)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if game_controller.in_menu:
+                    game_controller.handle_menu_click(mouse_pos)
+                elif not game_over:
+                    if game_controller.board.promotion_choice:
+                        if Width // 2 - 100 < mouse_pos[0] < Width // 2 + 100:
+                            if Height // 2 - 100 < mouse_pos[1] < Height // 2 - 50:
+                                game_controller.handle_promotion("Queen")
+                            elif Height // 2 - 50 < mouse_pos[1] < Height // 2:
+                                game_controller.handle_promotion("Rook")
+                            elif Height // 2 < mouse_pos[1] < Height // 2 + 50:
+                                game_controller.handle_promotion("Bishop")
+                            elif Height // 2 + 50 < mouse_pos[1] < Height // 2 + 100:
+                                game_controller.handle_promotion("Knight")
+                    else:
+                        if pygame.mouse.get_pressed()[0]:
+                            row, col = get_positions(mouse_pos[0], mouse_pos[1])
+                            game_controller.select(row, col)
 
-            if event.type == pygame.MOUSEMOTION and game.Board.promotion_choice:
-                game.update_window()  # Actualizar la ventana para reflejar el efecto de hover
+            if event.type == pygame.MOUSEMOTION and game_controller.board.promotion_choice:
+                game_controller.update()
 
 main()

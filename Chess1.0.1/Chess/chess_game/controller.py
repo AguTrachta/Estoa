@@ -1,49 +1,52 @@
-# game.py
-
-import pygame
-from .board import newBoard
+from .board import Board
+from .view import GameView
 from .constants import *
-from copy import deepcopy
 
-
-
-class Game:
-    def __init__(self, Width, Height, Rows, Cols, Square, Win):
-        self.Width = Width
-        self.Height = Height
-        self.Win = Win
-        self.Board = newBoard(Width, Height, Rows, Cols, Square, Win)
-        self.Square = Square
+class GameController:
+    def __init__(self, width, height, rows, cols, square, win):
+        self.board = Board(width, height, rows, cols, square)
+        self.view = GameView(win)
         self.selected = None
         self.turn = White
         self.valid_moves = []
-        self.Black_pieces_left = 16
-        self.White_pieces_left = 16
         self.game_over = False
         self.winner = None
-        
+        self.Black_pieces_left = 16
+        self.White_pieces_left = 16
+        self.in_menu = True
+        self.white_time = 300  # 5 minutos en segundos
+        self.black_time = 300  # 5 minutos en segundos
+        self.last_time = pygame.time.get_ticks()
 
-    def update_window(self):
-        self.Board.draw_Board()
-        self.Board.draw_pieces()
-        self.draw_available_moves()
-        if self.Board.promotion_choice:
-            self.show_promotion_choices()
-        if self.game_over:
-            self.show_winner()
-        pygame.display.update()
+    def update(self):
+        if self.in_menu:
+            play_rect, quit_rect = self.view.draw_main_menu()
+            return play_rect, quit_rect
+        else:
+            self.update_timers()
+            self.view.draw_board(self.board)
+            self.view.draw_pieces(self.board)
+            self.view.draw_available_moves(self.selected, self.valid_moves, self.board.Square)
+            self.view.draw_timers(self.white_time, self.black_time)
+            if self.board.promotion_choice:
+                self.view.show_promotion_choices()
+            if self.game_over:
+                self.view.show_winner(self.winner)
+            pygame.display.update()
+            return None, None
 
     def reset(self):
-        self.Board = newBoard(self.Width, self.Height, self.Rows, self.Cols, self.Square, self.Win)
-        self.Square = self.Square
+        self.board = Board(self.board.Width, self.board.Height, self.board.Rows, self.board.Cols, self.board.Square)
         self.selected = None
         self.game_over = False
         self.winner = None
         self.turn = White
         self.Black_pieces_left = 16
         self.White_pieces_left = 16
-        print("Game reset")
-        
+        self.white_time = 300
+        self.black_time = 300
+        self.last_time = pygame.time.get_ticks()
+
     def check_game(self):
         if self.Black_pieces_left == 0:
             self.game_over = True
@@ -59,95 +62,80 @@ class Game:
             self.update_window()
             return True
 
-        if self.is_stalemate(self.Board):  # Verificación de ahogado
+        if self.is_stalemate(self.board):  # Verificación de ahogado
             self.game_over = True
             self.winner = "Stalemate - Draw"
             print("Game Over: Stalemate")
-            self.update_window()
+            self.update()
             return True
 
-        if self.checkmate(self.Board):
+        if self.checkmate(self.board):
             self.game_over = True
             if self.turn == White:
                 self.winner = "Black Wins"
             else:
                 self.winner = "White wins"
             print(f"Game Over: {self.winner}")
-            self.update_window()
+            self.update()
             return True
         
         if self.is_insufficient_material():
             self.game_over = True
             self.winner = "Draw - Insufficient Material"
             print("Game Over: Draw - Insufficient Material")
-            self.update_window()
+            self.update()
             return True
 
         return False
-
 
     def enemies_moves(self, piece, Board):
         enemies_moves = []
         for r in range(len(Board)):
             for c in range(len(Board[r])):
-                if Board[r][c] != 0:
-                    if Board[r][c].color != piece.color:
-                        moves = Board[r][c].get_available_moves(Board)
-                        for move in moves:
-                            enemies_moves.append(move)
+                if Board[r][c] != 0 and Board[r][c].color != piece.color:
+                    moves = Board[r][c].get_available_moves(Board)
+                    for move in moves:
+                        enemies_moves.append(move)
         return enemies_moves
-
 
     def get_King_pos(self, Board):
         for r in range(len(Board)):
             for c in range(len(Board[r])):
-                if Board[r][c] != 0:
-                    if Board[r][c].type == "King" and Board[r][c].color == self.turn:
-                        return (r, c)
+                if Board[r][c] != 0 and Board[r][c].type == "King" and Board[r][c].color == self.turn:
+                    return (r, c)
         return None
 
     def simulate_move(self, piece, row, col):
         piece_row, piece_col = piece.row, piece.col
-        target_piece = self.Board.Board[row][col]
+        target_piece = self.board.Board[row][col]
 
-        # Realizar el movimiento en el tablero temporalmente
-        self.Board.Board[row][col] = piece
-        self.Board.Board[piece_row][piece_col] = 0
+        self.board.Board[row][col] = piece
+        self.board.Board[piece_row][piece_col] = 0
 
-        # Actualizar la posición de la pieza
         piece.row, piece.col = row, col
 
-        # Verificar si el rey está en jaque después del movimiento
-        king_pos = self.get_King_pos(self.Board.Board)
+        king_pos = self.get_King_pos(self.board.Board)
         if king_pos:
-            #print(f"Posición del rey: {king_pos}")
-            enemy_moves = self.enemies_moves(piece, self.Board.Board)
-            #print(f"Movimientos enemigos: {enemy_moves}")
+            enemy_moves = self.enemies_moves(piece, self.board.Board)
             if king_pos in enemy_moves:
-                print(f"El rey está en jaque después del movimiento: {piece} a ({row}, {col})")
-                # Restaurar el estado del tablero si el movimiento pone al rey en jaque
                 piece.row, piece.col = piece_row, piece_col
-                self.Board.Board[row][col] = target_piece
-                self.Board.Board[piece_row][piece_col] = piece
+                self.board.Board[row][col] = target_piece
+                self.board.Board[piece_row][piece_col] = piece
                 return False
 
-        # Restaurar la posición original de la pieza y el estado del tablero
         piece.row, piece.col = piece_row, piece_col
-        self.Board.Board[row][col] = target_piece
-        self.Board.Board[piece_row][piece_col] = piece
+        self.board.Board[row][col] = target_piece
+        self.board.Board[piece_row][piece_col] = piece
         return True
 
-
-
-    def possible_moves(self, Board):
+    def possible_moves(self, board):
         possible_moves = []
-        for r in range(len(Board)):
-            for c in range(len(Board[r])):
-                if Board[r][c] != 0:
-                    if Board[r][c].color == self.turn and Board[r][c].type != "King":
-                        moves = Board[r][c].get_available_moves(Board)
-                        for move in moves:
-                            possible_moves.append((r, c, move[0], move[1]))  # Include piece position and move position
+        for r in range(len(board)):
+            for c in range(len(board[r])):
+                if board[r][c] != 0 and board[r][c].color == self.turn and board[r][c].type != "King":
+                    moves = board[r][c].get_available_moves(board)
+                    for move in moves:
+                        possible_moves.append((r, c, move[0], move[1]))
         return possible_moves
 
     def is_stalemate(self, Board):
@@ -199,9 +187,9 @@ class Game:
         }
 
         # Contar el número de piezas restantes en el tablero
-        for r in range(len(self.Board.Board)):
-            for c in range(len(self.Board.Board[r])):
-                piece = self.Board.get_piece(r, c)
+        for r in range(len(self.board.Board)):
+            for c in range(len(self.board.Board[r])):
+                piece = self.board.get_piece(r, c)
                 if piece != 0:
                     piece_count[piece.color][piece.type] += 1
 
@@ -269,9 +257,7 @@ class Game:
             print(f"Stalemate detected for {'White' if self.turn == Black else 'Black'}")
             return False
 
-
     def copy_board(self, board):
-        # Crear una copia manual del tablero sin superficies de Pygame
         new_board = []
         for row in board:
             new_row = []
@@ -285,10 +271,12 @@ class Game:
         return new_board
 
     def change_turn(self):
+        self.update_timers()
         if self.turn == White:
             self.turn = Black
         else:
             self.turn = White
+        self.last_time = pygame.time.get_ticks()
 
     def select(self, row, col):
         if self.selected:
@@ -297,16 +285,13 @@ class Game:
                 self.selected = None
                 self.select(row, col)
 
-        piece = self.Board.get_piece(row, col)
+        piece = self.board.get_piece(row, col)
         if piece != 0 and self.turn == piece.color:
             self.selected = piece
-            self.valid_moves = piece.get_available_moves(self.Board.Board)
-
-            print(f"Selected {piece.type} at ({row}, {col})")
-            print(f"Valid moves: {self.valid_moves}")
+            self.valid_moves = piece.get_available_moves(self.board.Board)
 
     def _move(self, row, col):
-        piece = self.Board.get_piece(row, col)
+        piece = self.board.get_piece(row, col)
         if self.selected and (row, col) in self.valid_moves:
             if piece == 0 or piece.color != self.selected.color:
                 if self.selected.type == "King" and abs(self.selected.col - col) == 2:
@@ -314,28 +299,31 @@ class Game:
                     self.perform_castling(self.selected, row, col)
                 else:
                     if self.simulate_move(self.selected, row, col):
-                        self.remove(self.Board.Board, piece, row, col)
-                        self.Board.move(self.selected, row, col)
+                        self.remove_piece(self.board.Board, piece, row, col)
+                        self.board.move(self.selected, row, col)
                         self.change_turn()
                         self.valid_moves = []
                         self.selected = None
+                        if self.check_game():  # Verificar el estado del juego después de cada movimiento
+                            print(f"Game Over: {self.winner}")
                         return True
         return False
 
     def perform_castling(self, king, row, col):
         if col == 6:  # Enroque corto
-            rook = self.Board.get_piece(row, 7)
-            self.Board.move(king, row, col)
-            self.Board.move(rook, row, col - 1)
+            rook = self.board.get_piece(row, 7)
+            self.board.move(king, row, col)
+            self.board.move(rook, row, col - 1)
         elif col == 2:  # Enroque largo
-            rook = self.Board.get_piece(row, 0)
-            self.Board.move(king, row, col)
-            self.Board.move(rook, row, col + 1)
+            rook = self.board.get_piece(row, 0)
+            self.board.move(king, row, col)
+            self.board.move(rook, row, col + 1)
         self.change_turn()
         self.valid_moves = []
         self.selected = None
+        self.update()  # Actualiza la ventana inmediatamente después del enroque
 
-    def remove(self, board, piece, row, col):
+    def remove_piece(self, board, piece, row, col):
         if piece != 0:
             board[row][col] = 0
             if piece.color == White:
@@ -345,73 +333,30 @@ class Game:
         print("White_pieces_left : ", self.White_pieces_left)
         print("Black_pieces_left : ", self.Black_pieces_left)
 
-    def draw_available_moves(self):
-        if self.selected is not None:
-            for pos in self.valid_moves:  # Cambiado de self.selected.available_moves a self.valid_moves
-                row, col = pos[0], pos[1]
-                # Verificar si el movimiento es un enroque
-                if self.selected.type == "King" and abs(self.selected.col - col) == 2:
-                    color = (0, 0, 255)  # Azul para el enroque
-                else:
-                    color = (0, 255, 0)  # Verde para otros movimientos
-
-                pygame.draw.circle(self.Win, color,
-                                (col * self.Square + self.Square // 2, row * self.Square + self.Square // 2),
-                                self.Square // 8)
-
-    def get_board(self):
-        return self.board
-
-    def show_winner(self):
-        # Crear una superficie semi-transparente para el fondo del mensaje
-        overlay = pygame.Surface((self.Width, self.Height))
-        overlay.set_alpha(180)  # Transparencia: 0 (completamente transparente) a 255 (completamente opaco)
-        overlay.fill((0, 0, 0))  # Color del fondo (negro)
-        self.Win.blit(overlay, (0, 0))
-
-        # Configurar la fuente y el tamaño del texto
-        font = pygame.font.SysFont('Arial', 72, bold=True)
-        text = font.render(self.winner, True, (255, 255, 255))  # Texto en blanco
-
-        # Obtener las dimensiones del texto para centrarlo en la pantalla
-        text_rect = text.get_rect(center=(self.Width // 2, self.Height // 2))
-
-        # Dibujar el texto en la ventana
-        self.Win.blit(text, text_rect)
-        pygame.display.update()
-        print(f"Winner displayed: {self.winner}")
-
-    # game.py
-
-    def show_promotion_choices(self):
-        # Crear una superficie semi-transparente para el fondo del mensaje
-        overlay = pygame.Surface((self.Width, self.Height))
-        overlay.set_alpha(180)  # Transparencia: 0 (completamente transparente) a 255 (completamente opaco)
-        overlay.fill((0, 0, 0))  # Color del fondo (negro)
-        self.Win.blit(overlay, (0, 0))
-
-        # Configurar la fuente y el tamaño del texto
-        font = pygame.font.SysFont('Arial', 36, bold=True)
-        choices = ["Queen", "Rook", "Bishop", "Knight"]
-        choice_texts = [font.render(choice, True, (255, 255, 255)) for choice in choices]
-
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-
-        # Dibujar las opciones en la ventana con efecto de hover
-        for i, text in enumerate(choice_texts):
-            text_rect = text.get_rect(center=(self.Width // 2, self.Height // 2 - 75 + i * 50))
-
-            # Verificar si el mouse está sobre la opción
-            if text_rect.collidepoint(mouse_x, mouse_y):
-                pygame.draw.rect(self.Win, (150, 150, 150),
-                                 text_rect.inflate(20, 10))  # Color de fondo para el efecto de hover
-
-            self.Win.blit(text, text_rect)
-
-        pygame.display.update()
-        print("Promotion choices displayed")
-
     def handle_promotion(self, choice):
-        if self.Board.promotion_choice:
-            self.Board.promote_pawn(choice)
-            self.Board.promotion_choice = None  # Reiniciar la opción de promoción
+        if self.board.promotion_choice:
+            self.board.promote_pawn(choice)
+            self.board.promotion_choice = None  # Reiniciar la opción de promoción
+
+    def handle_menu_click(self, mouse_pos):
+        play_rect, quit_rect = self.update()
+        if play_rect and play_rect.collidepoint(mouse_pos):
+            self.in_menu = False
+        elif quit_rect and quit_rect.collidepoint(mouse_pos):
+            pygame.quit()
+            quit()
+
+    def update_timers(self):
+        current_time = pygame.time.get_ticks()
+        elapsed_time = (current_time - self.last_time) / 1000
+        if self.turn == White:
+            self.white_time -= elapsed_time
+        else:
+            self.black_time -= elapsed_time
+        self.last_time = current_time
+        if self.white_time <= 0:
+            self.game_over = True
+            self.winner = "Black Wins by Timeout"
+        elif self.black_time <= 0:
+            self.game_over = True
+            self.winner = "White Wins by Timeout"

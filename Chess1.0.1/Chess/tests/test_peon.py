@@ -3,15 +3,19 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
+import pygame
 from chess_game.Pieces import Pawn
 from chess_game.constants import White, Black
 
-#Prueba los movimientos del Peon
+# Prueba los movimientos del Peon
 class TestPawnMovement(unittest.TestCase):
     def setUp(self):
+        pygame.init()
         self.square = 80  # Tamaño arbitrario del cuadrado
         self.board = [[0] * 8 for _ in range(8)]  # Tablero vacío
+
+    def tearDown(self):
+        pygame.quit()
 
     def test_pawn_initial_move(self):
         white_pawn = Pawn(self.square, None, White, "Pawn", 6, 0)

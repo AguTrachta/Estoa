@@ -1,0 +1,11 @@
+name: chess-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytest
+  - flake8
+  - pip
+  - pip:
+    - pygame

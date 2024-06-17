@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import unittest
-from chess_game.board import newBoard
+from chess_game.board import Board
 from chess_game.constants import White, Black
 from chess_game.Pieces import Pawn, Rook
 
@@ -15,8 +15,7 @@ class TestBoardInitialization(unittest.TestCase):
         self.rows = 8
         self.cols = 8
         self.square = self.width // self.cols
-        self.win = None  # No necesitamos la ventana para esta prueba
-        self.board = newBoard(self.width, self.height, self.rows, self.cols, self.square, self.win)
+        self.board = Board(self.width, self.height, self.rows, self.cols, self.square)
 
     def test_board_initialization(self):
         self.board.create_Board()

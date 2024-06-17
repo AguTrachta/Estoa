@@ -46,8 +46,6 @@ class PawnMoveStrategy(MoveStrategy):
         piece.clear_available_moves()
         row, col = piece.row, piece.col
 
-        print(f"Calculating moves for Pawn at ({row}, {col})")
-
         if piece.color == White:
             if row - 1 >= 0:
                 if Board[row - 1][col] == 0:
@@ -58,6 +56,17 @@ class PawnMoveStrategy(MoveStrategy):
                     piece.capture_moves.append((row - 1, col - 1))
                 if col + 1 < len(Board[0]) and Board[row - 1][col + 1] != 0 and Board[row - 1][col + 1].color != piece.color:
                     piece.capture_moves.append((row - 1, col + 1))
+
+                # Check for en passant
+                if row == 3:  # Fifth rank for white pawns
+                    if col - 1 >= 0:
+                        left_piece = Board[row][col - 1]
+                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move == False:
+                            piece.capture_moves.append((row - 1, col - 1))
+                    if col + 1 < len(Board[0]):
+                        right_piece = Board[row][col + 1]
+                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move == False:
+                            piece.capture_moves.append((row - 1, col + 1))
 
                 # Check for en passant
                 if row == 3:  # Fifth rank for white pawns
@@ -91,9 +100,6 @@ class PawnMoveStrategy(MoveStrategy):
                         right_piece = Board[row][col + 1]
                         if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move == False:
                             piece.capture_moves.append((row + 1, col + 1))
-
-        print(f"Available moves: {piece.available_moves}")
-        print(f"Capture moves: {piece.capture_moves}")
 
         return piece.available_moves + piece.capture_moves
     
