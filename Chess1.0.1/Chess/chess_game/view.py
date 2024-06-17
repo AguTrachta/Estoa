@@ -4,6 +4,7 @@ from .constants import *
 class GameView:
     def __init__(self, win):
         self.win = win
+        self.background_image = pygame.image.load('Chess1.0.1/Chess/chess_game/chess_images/chess_image.webp')
 
     def draw_board(self, board):
         self.win.fill(CustomBrown)
@@ -68,3 +69,42 @@ class GameView:
 
         pygame.display.update()
         print("Promotion choices displayed")
+
+    def draw_main_menu(self):
+        self.win.blit(self.background_image, (0, 0))  # Dibujar la imagen de fondo
+
+        # Dibujar el overlay oscuro
+        overlay = pygame.Surface((Width, Height))
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        self.win.blit(overlay, (0, 0))
+
+        font_title = pygame.font.SysFont('Arial', 100, bold=True)
+        font_option = pygame.font.SysFont('Arial', 72, bold=True)
+        
+        # Dibujar título "Estoa Chess"
+        title_text = font_title.render('Estoa Chess', True, (255, 255, 255))
+        title_rect = title_text.get_rect(center=(Width // 2, Height // 2 - 200))
+        self.win.blit(title_text, title_rect)
+
+        # Dibujar texto "Jugar"
+        play_text = font_option.render('Jugar', True, (255, 255, 255))
+        play_rect = play_text.get_rect(center=(Width // 2, Height // 2 - 50))
+
+        # Dibujar texto "Salir"
+        quit_text = font_option.render('Salir', True, (255, 255, 255))
+        quit_rect = quit_text.get_rect(center=(Width // 2, Height // 2 + 50))
+
+        # Efecto de hover
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if play_rect.collidepoint((mouse_x, mouse_y)):
+            play_text = font_option.render('Jugar', True, (255, 0, 0))  # Color rojo en hover
+        if quit_rect.collidepoint((mouse_x, mouse_y)):
+            quit_text = font_option.render('Salir', True, (255, 0, 0))  # Color rojo en hover
+
+        self.win.blit(play_text, play_rect)
+        self.win.blit(quit_text, quit_rect)
+
+        pygame.display.update()
+
+        return play_rect, quit_rect

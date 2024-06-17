@@ -13,16 +13,22 @@ class GameController:
         self.winner = None
         self.Black_pieces_left = 16
         self.White_pieces_left = 16
+        self.in_menu = True
 
     def update(self):
-        self.view.draw_board(self.board)
-        self.view.draw_pieces(self.board)
-        self.view.draw_available_moves(self.selected, self.valid_moves, self.board.Square)
-        if self.board.promotion_choice:
-            self.view.show_promotion_choices()
-        if self.game_over:
-            self.view.show_winner(self.winner)
-        pygame.display.update()
+        if self.in_menu:
+            play_rect, quit_rect = self.view.draw_main_menu()
+            return play_rect, quit_rect
+        else:
+            self.view.draw_board(self.board)
+            self.view.draw_pieces(self.board)
+            self.view.draw_available_moves(self.selected, self.valid_moves, self.board.Square)
+            if self.board.promotion_choice:
+                self.view.show_promotion_choices()
+            if self.game_over:
+                self.view.show_winner(self.winner)
+            pygame.display.update()
+            return None, None
 
     def reset(self):
         self.board = Board(self.board.Width, self.board.Height, self.board.Rows, self.board.Cols, self.board.Square)
@@ -160,7 +166,6 @@ class GameController:
             self.selected = piece
             self.valid_moves = piece.get_available_moves(self.board.Board)
 
-
     def _move(self, row, col):
         piece = self.board.get_piece(row, col)
         if self.selected and (row, col) in self.valid_moves:
@@ -207,3 +212,10 @@ class GameController:
             self.board.promote_pawn(choice)
             self.board.promotion_choice = None  # Reiniciar la opción de promoción
 
+    def handle_menu_click(self, mouse_pos):
+        play_rect, quit_rect = self.update()
+        if play_rect and play_rect.collidepoint(mouse_pos):
+            self.in_menu = False
+        elif quit_rect and quit_rect.collidepoint(mouse_pos):
+            pygame.quit()
+            quit()
