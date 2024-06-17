@@ -22,7 +22,8 @@ def main():
 
     while run:
         clock.tick(FPS)
-        play_rect, quit_rect = game_controller.update()
+        if not game_over:
+            resign_rect = game_controller.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -34,13 +35,17 @@ def main():
                 if event.key == pygame.K_SPACE:
                     game_controller.reset()
                     game_over = False
+                    game_controller.winner_displayed = False  # Reiniciamos la bandera
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if game_controller.in_menu:
                     game_controller.handle_menu_click(mouse_pos)
                 elif not game_over:
-                    if game_controller.board.promotion_choice:
+                    if resign_rect and resign_rect.collidepoint(mouse_pos):
+                        game_controller.handle_resign()
+                        game_over = True
+                    elif game_controller.board.promotion_choice:
                         if Width // 2 - 100 < mouse_pos[0] < Width // 2 + 100:
                             if Height // 2 - 100 < mouse_pos[1] < Height // 2 - 50:
                                 game_controller.handle_promotion("Queen")
