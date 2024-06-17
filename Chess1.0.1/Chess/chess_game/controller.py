@@ -299,15 +299,21 @@ class GameController:
 
     def _move(self, row, col):
         piece = self.board.get_piece(row, col)
-        if self.selected and (row, col) in self.valid_moves:
+        if self.selected and (row, col) in [(move[0], move[1]) for move in self.valid_moves]:
             if piece == 0 or piece.color != self.selected.color:
+                # Handle castling
                 if self.selected.type == "King" and abs(self.selected.col - col) == 2:
-                    # Enroque
                     self.perform_castling(self.selected, row, col)
                 else:
+                    en_passant = (row, col) in [(move[0], move[1]) for move in self.valid_moves if len(move) == 3 and move[2]]
                     if self.simulate_move(self.selected, row, col):
                         self.remove_piece(self.board.Board, piece, row, col)
                         self.board.move(self.selected, row, col)
+                        if en_passant:
+                            if self.selected.color == White:
+                                self.board.Board[row + 1][col] = 0  # Remove the captured pawn
+                            else:
+                                self.board.Board[row - 1][col] = 0  # Remove the captured pawn
                         self.change_turn()
                         self.valid_moves = []
                         self.selected = None

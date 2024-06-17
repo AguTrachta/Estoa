@@ -61,23 +61,12 @@ class PawnMoveStrategy(MoveStrategy):
                 if row == 3:  # Fifth rank for white pawns
                     if col - 1 >= 0:
                         left_piece = Board[row][col - 1]
-                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move == False:
-                            piece.capture_moves.append((row - 1, col - 1))
+                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move is False:
+                            piece.capture_moves.append((row - 1, col - 1, True))  # Mark as en passant move
                     if col + 1 < len(Board[0]):
                         right_piece = Board[row][col + 1]
-                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move == False:
-                            piece.capture_moves.append((row - 1, col + 1))
-
-                # Check for en passant
-                if row == 3:  # Fifth rank for white pawns
-                    if col - 1 >= 0:
-                        left_piece = Board[row][col - 1]
-                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move == False:
-                            piece.capture_moves.append((row - 1, col - 1))
-                    if col + 1 < len(Board[0]):
-                        right_piece = Board[row][col + 1]
-                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move == False:
-                            piece.capture_moves.append((row - 1, col + 1))
+                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move is False:
+                            piece.capture_moves.append((row - 1, col + 1, True))  # Mark as en passant move
 
         if piece.color == Black:
             if row + 1 < len(Board):
@@ -94,14 +83,15 @@ class PawnMoveStrategy(MoveStrategy):
                 if row == 4:  # Fourth rank for black pawns
                     if col - 1 >= 0:
                         left_piece = Board[row][col - 1]
-                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move == False:
-                            piece.capture_moves.append((row + 1, col - 1))
+                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move is False:
+                            piece.capture_moves.append((row + 1, col - 1, True))  # Mark as en passant move
                     if col + 1 < len(Board[0]):
                         right_piece = Board[row][col + 1]
-                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move == False:
-                            piece.capture_moves.append((row + 1, col + 1))
+                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move is False:
+                            piece.capture_moves.append((row + 1, col + 1, True))  # Mark as en passant move
 
         return piece.available_moves + piece.capture_moves
+
     
 class RookMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
