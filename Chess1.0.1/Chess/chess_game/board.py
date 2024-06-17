@@ -1,23 +1,16 @@
-# board.py
-
-
 from .Pieces import *
 from .constants import *
-import pygame
 
-
-class newBoard:
-    def __init__(self, Width, Height, Rows, Cols, Square, Win):
+class Board:
+    def __init__(self, Width, Height, Rows, Cols, Square):
         self.Width = Width
         self.Height = Height
         self.Square = Square
-        self.GameBoard = self.Width // 2
-        self.Win = Win
         self.Rows = Rows
         self.Cols = Cols
         self.Board = []
         self.create_Board()
-        self.promotion_choice = None  # Nueva variable para guardar la opción de promoción
+        self.promotion_choice = None
 
     def create_Board(self):
         for row in range(self.Rows):
@@ -58,32 +51,14 @@ class newBoard:
     def move(self, piece, row, col):
         self.Board[piece.row][piece.col], self.Board[row][col] = self.Board[row][col], self.Board[piece.row][piece.col]
         piece.piece_move(row, col)
-        piece.first_move = False  # Marcar que la pieza ha sido movida
+        piece.first_move = False
 
-        # Verificar si es un peón que llegó al final del tablero
         if piece.type == "Pawn":
             if (piece.color == White and row == 0) or (piece.color == Black and row == 7):
-                self.promotion_choice = piece  # Guardar el peón que debe ser promovido
+                self.promotion_choice = piece
 
-
-
-    def draw_Board(self):
-        self.Win.fill(CustomBrown)
-
-        for row in range(self.Rows):
-            for col in range(row % 2, self.Cols, 2):
-                pygame.draw.rect(self.Win, CustomBeige,
-                                 (col * self.Square, row * self.Square, self.Square, self.Square))
-
-    def draw_piece(self, piece, Win):
-        Win.blit(piece.image, (piece.x, piece.y))
-
-
-    def draw_pieces(self):
-        for row in range(self.Rows):
-            for col in range(self.Cols):
-                if self.Board[row][col] != 0:
-                    self.draw_piece(self.Board[row][col], self.Win)
+    def remove_piece(self, piece):
+        self.Board[piece.row][piece.col] = 0
 
     def promote_pawn(self, choice):
         if self.promotion_choice:
@@ -99,4 +74,5 @@ class newBoard:
             elif choice == "Knight":
                 self.Board[row][col] = Knight(self.Square, White_Knight if color == White else Black_Knight, color, "Knight", row, col)
 
-            self.promotion_choice = None  # Reiniciar la opción de promoción
+            self.promotion_choice = None
+

@@ -1,6 +1,6 @@
 import pygame
+from chess_game.controller import GameController
 from chess_game.constants import *
-from chess_game.game import Game
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -12,16 +12,49 @@ def get_positions(x, y):
     col = x // Square
     return row, col
 
+def main_menu():
+    font = pygame.font.SysFont('Arial', 72)
+    run = True
+    while run:
+        Win.fill((0, 0, 0))
+
+        # Dibujar texto "Jugar"
+        play_text = font.render('Jugar', True, (255, 255, 255))
+        play_rect = play_text.get_rect(center=(Width // 2, Height // 2 - 50))
+        Win.blit(play_text, play_rect)
+
+        # Dibujar texto "Salir"
+        quit_text = font.render('Salir', True, (255, 255, 255))
+        quit_rect = quit_text.get_rect(center=(Width // 2, Height // 2 + 50))
+        Win.blit(quit_text, quit_rect)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if play_rect.collidepoint(mouse_pos):
+                    run = False
+                    main()
+                if quit_rect.collidepoint(mouse_pos):
+                    run = False
+                    pygame.quit()
+                    quit()
+
 def main():
     run = True
     game_over = False
     FPS = 120
-    game = Game(Width, Height, Rows, Cols, Square, Win)
+    game_controller = GameController(Width, Height, Rows, Cols, Square, Win)
 
     while run:
         clock.tick(FPS)
-        game.update_window()
-        if game.check_game():
+        game_controller.update()
+        if game_controller.check_game():
             game_over = True
 
         for event in pygame.event.get():
@@ -31,29 +64,28 @@ def main():
 
             if event.type == pygame.KEYDOWN and game_over:
                 if event.key == pygame.K_SPACE:
-                    game.reset()
+                    game_controller.reset()
                     game_over = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
-                if game.Board.promotion_choice:
+                if game_controller.board.promotion_choice:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-                    # Definir las áreas de clic para cada opción
                     if Width // 2 - 100 < mouse_x < Width // 2 + 100:
                         if Height // 2 - 100 < mouse_y < Height // 2 - 50:
-                            game.handle_promotion("Queen")
+                            game_controller.handle_promotion("Queen")
                         elif Height // 2 - 50 < mouse_y < Height // 2:
-                            game.handle_promotion("Rook")
+                            game_controller.handle_promotion("Rook")
                         elif Height // 2 < mouse_y < Height // 2 + 50:
-                            game.handle_promotion("Bishop")
+                            game_controller.handle_promotion("Bishop")
                         elif Height // 2 + 50 < mouse_y < Height // 2 + 100:
-                            game.handle_promotion("Knight")
+                            game_controller.handle_promotion("Knight")
                 else:
                     if pygame.mouse.get_pressed()[0]:
                         location = pygame.mouse.get_pos()
                         row, col = get_positions(location[0], location[1])
-                        game.select(row, col)
+                        game_controller.select(row, col)
 
-            if event.type == pygame.MOUSEMOTION and game.Board.promotion_choice:
-                game.update_window()  # Actualizar la ventana para reflejar el efecto de hover
+            if event.type == pygame.MOUSEMOTION and game_controller.board.promotion_choice:
+                game_controller.update()
 
-main()
+main_menu()

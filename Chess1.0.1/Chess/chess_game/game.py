@@ -112,7 +112,7 @@ class Game:
                 self.Board.Board[piece_row][piece_col] = piece
                 return False
 
-        # Restaurar la posición original de la pieza y el estado del tablero
+        # Restaurar la posición original de la GE y el estado del tablero
         piece.row, piece.col = piece_row, piece_col
         self.Board.Board[row][col] = target_piece
         self.Board.Board[piece_row][piece_col] = piece

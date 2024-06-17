@@ -46,8 +46,6 @@ class PawnMoveStrategy(MoveStrategy):
         piece.clear_available_moves()
         row, col = piece.row, piece.col
 
-        print(f"Calculating moves for Pawn at ({row}, {col})")
-
         if piece.color == White:
             if row - 1 >= 0:
                 if Board[row - 1][col] == 0:
@@ -69,9 +67,6 @@ class PawnMoveStrategy(MoveStrategy):
                     piece.capture_moves.append((row + 1, col - 1))
                 if col + 1 < len(Board[0]) and Board[row + 1][col + 1] != 0 and Board[row + 1][col + 1].color != piece.color:
                     piece.capture_moves.append((row + 1, col + 1))
-
-        print(f"Available moves: {piece.available_moves}")
-        print(f"Capture moves: {piece.capture_moves}")
 
         return piece.available_moves + piece.capture_moves
 
