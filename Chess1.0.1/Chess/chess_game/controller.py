@@ -17,24 +17,31 @@ class GameController:
         self.white_time = 300  # 5 minutos en segundos
         self.black_time = 300  # 5 minutos en segundos
         self.last_time = pygame.time.get_ticks()
+        self.winner_displayed = False  # Añadimos esta bandera
 
     def update(self):
         if self.in_menu:
             play_rect, quit_rect = self.view.draw_main_menu()
             return play_rect, quit_rect
         else:
-            self.update_timers()
-            self.view.draw_board(self.board)
-            self.view.draw_pieces(self.board)
-            self.view.draw_available_moves(self.selected, self.valid_moves, self.board.Square)
-            self.view.draw_timers(self.white_time, self.black_time)
-            if self.board.promotion_choice:
-                self.view.show_promotion_choices()
-            if self.game_over:
-                self.view.show_winner(self.winner)
-            pygame.display.update()
-            return None, None
-
+            if not self.game_over:
+                self.update_timers()
+                self.view.draw_board(self.board)
+                self.view.draw_pieces(self.board)
+                self.view.draw_available_moves(self.selected, self.valid_moves, self.board.Square)
+                self.view.draw_timers(self.white_time, self.black_time)
+                resign_rect = self.view.draw_resign_button()
+                if self.board.promotion_choice:
+                    self.view.show_promotion_choices()
+                pygame.display.update()
+                return resign_rect
+            else:
+                if not self.winner_displayed:
+                    self.view.show_winner(self.winner)
+                    pygame.display.update()
+                    self.winner_displayed = True
+                return None
+            
     def reset(self):
         self.board = Board(self.board.Width, self.board.Height, self.board.Rows, self.board.Cols, self.board.Square)
         self.selected = None
@@ -231,6 +238,12 @@ class GameController:
         elif quit_rect and quit_rect.collidepoint(mouse_pos):
             pygame.quit()
             quit()
+
+    def handle_resign(self):
+        self.game_over = True
+        self.winner = "Black Wins" if self.turn == White else "White Wins"
+        print(f"Game Over: {self.winner}")
+        self.update()
 
     def update_timers(self):
         current_time = pygame.time.get_ticks()

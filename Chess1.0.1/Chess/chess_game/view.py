@@ -131,3 +131,18 @@ class GameView:
         
         self.win.blit(white_text, white_rect)
         self.win.blit(black_text, black_rect)
+
+    def draw_resign_button(self):
+        font = pygame.font.SysFont('Arial', 36, bold=True)
+        resign_text = font.render('Rendirse', True, (255, 255, 255))
+        resign_rect = resign_text.get_rect(center=(Width + 50, Height // 2))
+        
+        # Efecto de hover
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if resign_rect.collidepoint((mouse_x, mouse_y)):
+            resign_text = font.render('Rendirse', True, (255, 0, 0))  # Color rojo en hover
+        
+        self.win.blit(resign_text, resign_rect)
+        pygame.display.update()
+        
+        return resign_rect
