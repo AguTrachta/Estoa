@@ -6,6 +6,7 @@ from .constants import *
 from copy import deepcopy
 
 
+
 class Game:
     def __init__(self, Width, Height, Rows, Cols, Square, Win):
         self.Width = Width
