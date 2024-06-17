@@ -14,15 +14,20 @@ class GameController:
         self.Black_pieces_left = 16
         self.White_pieces_left = 16
         self.in_menu = True
+        self.white_time = 300  # 5 minutos en segundos
+        self.black_time = 300  # 5 minutos en segundos
+        self.last_time = pygame.time.get_ticks()
 
     def update(self):
         if self.in_menu:
             play_rect, quit_rect = self.view.draw_main_menu()
             return play_rect, quit_rect
         else:
+            self.update_timers()
             self.view.draw_board(self.board)
             self.view.draw_pieces(self.board)
             self.view.draw_available_moves(self.selected, self.valid_moves, self.board.Square)
+            self.view.draw_timers(self.white_time, self.black_time)
             if self.board.promotion_choice:
                 self.view.show_promotion_choices()
             if self.game_over:
@@ -38,6 +43,9 @@ class GameController:
         self.turn = White
         self.Black_pieces_left = 16
         self.White_pieces_left = 16
+        self.white_time = 300
+        self.black_time = 300
+        self.last_time = pygame.time.get_ticks()
 
     def check_game(self):
         if self.Black_pieces_left == 0:
@@ -149,10 +157,12 @@ class GameController:
         return new_board
 
     def change_turn(self):
+        self.update_timers()
         if self.turn == White:
             self.turn = Black
         else:
             self.turn = White
+        self.last_time = pygame.time.get_ticks()
 
     def select(self, row, col):
         if self.selected:
@@ -180,6 +190,8 @@ class GameController:
                         self.change_turn()
                         self.valid_moves = []
                         self.selected = None
+                        if self.check_game():  # Verificar el estado del juego después de cada movimiento
+                            print(f"Game Over: {self.winner}")
                         return True
         return False
 
@@ -219,3 +231,18 @@ class GameController:
         elif quit_rect and quit_rect.collidepoint(mouse_pos):
             pygame.quit()
             quit()
+
+    def update_timers(self):
+        current_time = pygame.time.get_ticks()
+        elapsed_time = (current_time - self.last_time) / 1000
+        if self.turn == White:
+            self.white_time -= elapsed_time
+        else:
+            self.black_time -= elapsed_time
+        self.last_time = current_time
+        if self.white_time <= 0:
+            self.game_over = True
+            self.winner = "Black Wins by Timeout"
+        elif self.black_time <= 0:
+            self.game_over = True
+            self.winner = "White Wins by Timeout"

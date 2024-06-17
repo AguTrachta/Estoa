@@ -329,9 +329,6 @@ class KingMoveStrategy(MoveStrategy):
                         enemies_moves.append(move)
         return enemies_moves
 
-
-
-
 class Pawn(Piece):
     def __init__(self, Square, image, color, type, row, col):
         super().__init__(Square, image, color, type, row, col, PawnMoveStrategy())

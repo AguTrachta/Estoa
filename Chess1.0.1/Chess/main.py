@@ -5,7 +5,9 @@ from chess_game.constants import *
 pygame.init()
 clock = pygame.time.Clock()
 
-Win = pygame.display.set_mode((Width, Height))
+# Aumentar la pantalla para acomodar los temporizadores
+Width, Height = 800, 680  # Ajusta el tamaño según sea necesario
+Win = pygame.display.set_mode((Width + 200, Height))
 
 def get_positions(x, y):
     row = y // Square

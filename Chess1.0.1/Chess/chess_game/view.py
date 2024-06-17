@@ -33,14 +33,14 @@ class GameView:
                                    square // 8)
 
     def show_winner(self, winner):
-        overlay = pygame.Surface((Width, Height))
+        overlay = pygame.Surface((Width + 500, Height))
         overlay.set_alpha(180)
         overlay.fill((0, 0, 0))
         self.win.blit(overlay, (0, 0))
 
         font = pygame.font.SysFont('Arial', 72, bold=True)
         text = font.render(winner, True, (255, 255, 255))
-        text_rect = text.get_rect(center=(Width // 2, Height // 2))
+        text_rect = text.get_rect(center=(Width // 2 + 100, Height // 2))
 
         self.win.blit(text, text_rect)
         pygame.display.update()
@@ -59,7 +59,7 @@ class GameView:
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         for i, text in enumerate(choice_texts):
-            text_rect = text.get_rect(center=(Width // 2, Height // 2 - 75 + i * 50))
+            text_rect = text.get_rect(center=(Width // 2 , Height // 2 - 75 + i * 50))
 
             if text_rect.collidepoint(mouse_x, mouse_y):
                 pygame.draw.rect(self.win, (150, 150, 150),
@@ -73,8 +73,8 @@ class GameView:
     def draw_main_menu(self):
         self.win.blit(self.background_image, (0, 0))  # Dibujar la imagen de fondo
 
-        # Dibujar el overlay oscuro
-        overlay = pygame.Surface((Width, Height))
+        # Dibujar el overlay oscuro que cubra todo el fondo
+        overlay = pygame.Surface((Width + 500, Height))
         overlay.set_alpha(180)
         overlay.fill((0, 0, 0))
         self.win.blit(overlay, (0, 0))
@@ -84,16 +84,16 @@ class GameView:
         
         # Dibujar título "Estoa Chess"
         title_text = font_title.render('Estoa Chess', True, (255, 255, 255))
-        title_rect = title_text.get_rect(center=(Width // 2, Height // 2 - 200))
+        title_rect = title_text.get_rect(center=(Width // 2 + 100, Height // 2 - 200))
         self.win.blit(title_text, title_rect)
 
         # Dibujar texto "Jugar"
         play_text = font_option.render('Jugar', True, (255, 255, 255))
-        play_rect = play_text.get_rect(center=(Width // 2, Height // 2 - 50))
+        play_rect = play_text.get_rect(center=(Width // 2 + 100, Height // 2 - 50))
 
         # Dibujar texto "Salir"
         quit_text = font_option.render('Salir', True, (255, 255, 255))
-        quit_rect = quit_text.get_rect(center=(Width // 2, Height // 2 + 50))
+        quit_rect = quit_text.get_rect(center=(Width // 2 + 100, Height // 2 + 50))
 
         # Efecto de hover
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -108,3 +108,26 @@ class GameView:
         pygame.display.update()
 
         return play_rect, quit_rect
+
+    def draw_timers(self, white_time, black_time):
+        # Dibujar la imagen de fondo
+        self.win.blit(self.background_image, (Width - 121, 0))  # Coloca la imagen de fondo al lado derecho del tablero
+
+        # Dibujar el overlay oscuro para los relojes
+        overlay = pygame.Surface((500, Height))
+        overlay.set_alpha(100)
+        overlay.fill((0, 0, 0))
+        self.win.blit(overlay, (Width - 121, 0))
+
+        font = pygame.font.SysFont('Arial', 48, bold=True)
+        white_minutes, white_seconds = divmod(int(white_time), 60)
+        black_minutes, black_seconds = divmod(int(black_time), 60)
+        
+        white_text = font.render(f"White: {white_minutes:02d}:{white_seconds:02d}", True, (255, 255, 255))
+        black_text = font.render(f"Black: {black_minutes:02d}:{black_seconds:02d}", True, (255, 255, 255))
+        
+        white_rect = white_text.get_rect(center=(Width + 50, Height - 80))
+        black_rect = black_text.get_rect(center=(Width + 50, 80))
+        
+        self.win.blit(white_text, white_rect)
+        self.win.blit(black_text, black_rect)

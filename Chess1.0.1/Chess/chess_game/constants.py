@@ -2,9 +2,9 @@ import os
 import pygame
 
 # Definir constantes
-Width, Height = 680, 680
+Width, Height = 800, 680  # Ajustar el ancho para espacio adicional
 Rows, Cols = 8, 8
-Square = Width // Cols
+Square = Height // Cols
 
 # Definir colores
 White = (255, 255, 255)

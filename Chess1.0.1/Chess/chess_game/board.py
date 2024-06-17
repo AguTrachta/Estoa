@@ -75,4 +75,3 @@ class Board:
                 self.Board[row][col] = Knight(self.Square, White_Knight if color == White else Black_Knight, color, "Knight", row, col)
 
             self.promotion_choice = None
-
