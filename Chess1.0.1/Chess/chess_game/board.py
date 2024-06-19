@@ -1,3 +1,7 @@
+
+
+
+
 from .Pieces import *
 from .constants import *
 
@@ -25,7 +29,7 @@ class Board:
                     if col == 0 or col == 7:
                         self.Board[row][col] = Rook(self.Square, Black_Rook, Black, "Rook", row, col)
                     if col == 1 or col == 6:
-                        self.Board[row][col] = Knight(self.Square, Black_Knight, Black, "Knight", row, col)
+                       self.Board[row][col] = Knight(self.Square, Black_Knight, Black, "Knight", row, col)
                     if col == 2 or col == 5:
                         self.Board[row][col] = Bishop(self.Square, Black_Bishop, Black, "Bishop", row, col)
                     if col == 3:

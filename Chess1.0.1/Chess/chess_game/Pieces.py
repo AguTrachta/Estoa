@@ -57,6 +57,17 @@ class PawnMoveStrategy(MoveStrategy):
                 if col + 1 < len(Board[0]) and Board[row - 1][col + 1] != 0 and Board[row - 1][col + 1].color != piece.color:
                     piece.capture_moves.append((row - 1, col + 1))
 
+                # Check for en passant
+                if row == 3:  # Fifth rank for white pawns
+                    if col - 1 >= 0:
+                        left_piece = Board[row][col - 1]
+                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move is False:
+                            piece.capture_moves.append((row - 1, col - 1, True))  # Mark as en passant move
+                    if col + 1 < len(Board[0]):
+                        right_piece = Board[row][col + 1]
+                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move is False:
+                            piece.capture_moves.append((row - 1, col + 1, True))  # Mark as en passant move
+
         if piece.color == Black:
             if row + 1 < len(Board):
                 if Board[row + 1][col] == 0:
@@ -68,9 +79,20 @@ class PawnMoveStrategy(MoveStrategy):
                 if col + 1 < len(Board[0]) and Board[row + 1][col + 1] != 0 and Board[row + 1][col + 1].color != piece.color:
                     piece.capture_moves.append((row + 1, col + 1))
 
+                # Check for en passant
+                if row == 4:  # Fourth rank for black pawns
+                    if col - 1 >= 0:
+                        left_piece = Board[row][col - 1]
+                        if isinstance(left_piece, Pawn) and left_piece.color != piece.color and left_piece.first_move is False:
+                            piece.capture_moves.append((row + 1, col - 1, True))  # Mark as en passant move
+                    if col + 1 < len(Board[0]):
+                        right_piece = Board[row][col + 1]
+                        if isinstance(right_piece, Pawn) and right_piece.color != piece.color and right_piece.first_move is False:
+                            piece.capture_moves.append((row + 1, col + 1, True))  # Mark as en passant move
+
         return piece.available_moves + piece.capture_moves
 
-
+    
 class RookMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
         piece.clear_available_moves()
@@ -109,8 +131,6 @@ class RookMoveStrategy(MoveStrategy):
                 break
 
         return piece.available_moves + piece.capture_moves
-
-
 
 class BishopMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
@@ -190,7 +210,6 @@ class KnightMoveStrategy(MoveStrategy):
         #print(f"Capture moves: {piece.capture_moves}")
 
         return piece.available_moves + piece.capture_moves
-
 
 class QueenMoveStrategy(MoveStrategy):
     def get_available_moves(self, piece, Board):
@@ -298,13 +317,13 @@ class KingMoveStrategy(MoveStrategy):
         if piece.first_move and not self.is_in_check(piece, Board):
             # Enroque corto
             if col + 3 < 8 and isinstance(Board[row][col + 3], Rook) and Board[row][col + 3].first_move:
-                if all(Board[row][col + i] == 0 for i in range(1, 3)):
+                if Board[row][col + 1] == 0 and Board[row][col + 2] == 0:
                     if not self.is_in_check_path(piece, Board, [(row, col + 1), (row, col + 2)]):
                         piece.available_moves.append((row, col + 2))  # Enroque corto
 
             # Enroque largo
             if col - 4 >= 0 and isinstance(Board[row][col - 4], Rook) and Board[row][col - 4].first_move:
-                if all(Board[row][col - i] == 0 for i in range(1, 4)):
+                if Board[row][col - 1] == 0 and Board[row][col - 2] == 0 and Board[row][col - 3] == 0:
                     if not self.is_in_check_path(piece, Board, [(row, col - 1), (row, col - 2)]):
                         piece.available_moves.append((row, col - 2))  # Enroque largo
 
@@ -333,6 +352,7 @@ class Pawn(Piece):
     def __init__(self, Square, image, color, type, row, col):
         super().__init__(Square, image, color, type, row, col, PawnMoveStrategy())
         self.first_move = True
+
 
 class Rook(Piece):
     def __init__(self, Square, image, color, type, row, col):

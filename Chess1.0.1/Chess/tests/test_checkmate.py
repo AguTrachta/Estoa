@@ -1,19 +1,26 @@
 import sys
 import os
+import pygame
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import unittest
 from unittest.mock import Mock
-import pygame
 from chess_game.Pieces import King, Queen, Rook
 from chess_game.constants import White, Black
 from chess_game.controller import GameController
 from chess_game.board import Board
 
 class TestCheckmate(unittest.TestCase):
-    def setUp(self):
-        # Inicializar el juego
+    @classmethod
+    def setUpClass(cls):
         pygame.init()
+        pygame.display.set_mode((1, 1))  # Configurar una ventana mínima para pygame
+
+    @classmethod
+    def tearDownClass(cls):
+        pygame.quit()
+
+    def setUp(self):
         self.Width = 800
         self.Height = 800
         self.Rows = 8
@@ -54,3 +61,4 @@ class TestCheckmate(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

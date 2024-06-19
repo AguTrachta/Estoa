@@ -58,17 +58,41 @@ class GameController:
         if self.Black_pieces_left == 0:
             self.game_over = True
             self.winner = "Whites win"
+            print("Game Over: Whites win")
+            self.update_window()
             return True
 
         if self.White_pieces_left == 0:
             self.game_over = True
             self.winner = "Blacks win"
+            print("Game Over: Blacks win")
+            self.update_window()
+            return True
+
+        if self.is_stalemate(self.board):  # Verificación de ahogado
+            self.game_over = True
+            self.winner = "Stalemate - Draw"
+            print("Game Over: Stalemate")
+            self.update()
             return True
 
         if self.checkmate(self.board):
             self.game_over = True
-            self.winner = "Black Wins" if self.turn == White else "White wins"
+            if self.turn == White:
+                self.winner = "Black Wins"
+            else:
+                self.winner = "White wins"
+            print(f"Game Over: {self.winner}")
+            self.update()
             return True
+        
+        if self.is_insufficient_material():
+            self.game_over = True
+            self.winner = "Draw - Insufficient Material"
+            print("Game Over: Draw - Insufficient Material")
+            self.update()
+            return True
+
         return False
 
     def enemies_moves(self, piece, Board):
@@ -121,34 +145,124 @@ class GameController:
                         possible_moves.append((r, c, move[0], move[1]))
         return possible_moves
 
-    def checkmate(self, board):
-        king_pos = self.get_King_pos(board.Board)
+    def is_stalemate(self, Board):
+        king_pos = self.get_King_pos(Board.Board)
         if not king_pos:
+            print("No king found")
             return False
 
-        king_piece = board.get_piece(king_pos[0], king_pos[1])
-        king_available_moves = set(king_piece.get_available_moves(board.Board))
-        enemies_moves_set = set(self.enemies_moves(king_piece, board.Board))
+        king_piece = Board.get_piece(king_pos[0], king_pos[1])
+        king_available_moves = set(king_piece.get_available_moves(Board.Board))
+        enemies_moves_set = set(self.enemies_moves(king_piece, Board.Board))
 
-        king_moves = set()
+        # Verificar si el rey está en jaque
+        king_in_check = king_pos in enemies_moves_set
+
+        if king_in_check:
+            return False  # No es ahogado si el rey está en jaque
+
+        # Verificar si el rey tiene movimientos legales
+        king_safe_moves = set()
         for move in king_available_moves:
-            temp_board = self.copy_board(board.Board)
+            temp_board = self.copy_board(Board.Board)
             temp_board[king_piece.row][king_piece.col] = 0
             temp_board[move[0]][move[1]] = king_piece
             if move not in self.enemies_moves(king_piece, temp_board):
-                king_moves.add(move)
+                king_safe_moves.add(move)
 
-        if len(king_moves) > 0:
-            return False
+        if len(king_safe_moves) > 0:
+            print(f"King has safe moves: {king_safe_moves}")
+            return False  # No es ahogado si el rey tiene movimientos seguros
 
-        all_possible_moves = self.possible_moves(board.Board)
+        # Verificar si el jugador tiene movimientos legales
+        all_possible_moves = self.possible_moves(Board.Board)
         for move in all_possible_moves:
             r, c, move_r, move_c = move
-            piece = board.get_piece(r, c)
+            piece = Board.get_piece(r, c)
+            if piece.color == self.turn:
+                if self.simulate_move(piece, move_r, move_c):
+                    print(f"Move {move} is a legal move")
+                    return False  # No es ahogado si alguna pieza tiene movimientos legales
+
+        print("Stalemate detected")
+        return True
+    
+    def is_insufficient_material(self):
+        piece_count = {
+            White: {"King": 0, "Queen": 0, "Rook": 0, "Bishop": 0, "Knight": 0, "Pawn": 0},
+            Black: {"King": 0, "Queen": 0, "Rook": 0, "Bishop": 0, "Knight": 0, "Pawn": 0},
+        }
+
+        # Contar el número de piezas restantes en el tablero
+        for r in range(len(self.board.Board)):
+            for c in range(len(self.board.Board[r])):
+                piece = self.board.get_piece(r, c)
+                if piece != 0:
+                    piece_count[piece.color][piece.type] += 1
+
+        # Verificar condiciones de insuficiencia de material
+        if (piece_count[White]["King"] == 1 and piece_count[Black]["King"] == 1 and
+                piece_count[Black]["Queen"] == 0 and piece_count[Black]["Rook"] == 0 and
+                piece_count[Black]["Bishop"] == 0 and piece_count[Black]["Knight"] == 0 and
+                piece_count[Black]["Pawn"] == 0):
+            return True
+
+        if (piece_count[White]["King"] == 1 and piece_count[White]["Knight"] == 1 and
+                piece_count[Black]["King"] == 1 and
+                piece_count[Black]["Queen"] == 0 and piece_count[Black]["Rook"] == 0 and
+                piece_count[Black]["Bishop"] == 0 and piece_count[Black]["Knight"] == 1 and
+                piece_count[Black]["Pawn"] == 0):
+            return True
+
+        return False
+
+    def checkmate(self, Board):
+        king_pos = self.get_King_pos(Board.Board)
+        if not king_pos:
+            print("No king found")
+            return False
+
+        print(f"King position: {king_pos}")
+        king_piece = Board.get_piece(king_pos[0], king_pos[1])
+        king_available_moves = set(king_piece.get_available_moves(Board.Board))
+        enemies_moves_set = set(self.enemies_moves(king_piece, Board.Board))
+
+        # Verificar si el rey está en jaque
+        if king_pos in enemies_moves_set:
+            print(f"King is in check at position: {king_pos}")
+            king_in_check = True
+        else:
+            print(f"King is not in check at position: {king_pos}")
+            king_in_check = False
+
+        # Verificar si algún movimiento del rey lo pone fuera de peligro
+        king_safe_moves = set()
+        for move in king_available_moves:
+            temp_board = self.copy_board(Board.Board)
+            temp_board[king_piece.row][king_piece.col] = 0
+            temp_board[move[0]][move[1]] = king_piece
+            if move not in self.enemies_moves(king_piece, temp_board):
+                king_safe_moves.add(move)
+
+        if len(king_safe_moves) > 0:
+            print(f"King has safe moves: {king_safe_moves}")
+            return False
+
+        # Verificar si alguna pieza puede bloquear el jaque o capturar la pieza atacante
+        all_possible_moves = self.possible_moves(Board.Board)
+        for move in all_possible_moves:
+            r, c, move_r, move_c = move
+            piece = Board.get_piece(r, c)
             if self.simulate_move(piece, move_r, move_c):
+                print(f"Move {move} can block the check")
                 return False
 
-        return True
+        if king_in_check:
+            print(f"Checkmate detected for {'White' if self.turn == Black else 'Black'}")
+            return True
+        else:
+            print(f"Stalemate detected for {'White' if self.turn == Black else 'Black'}")
+            return False
 
     def copy_board(self, board):
         new_board = []
@@ -185,15 +299,21 @@ class GameController:
 
     def _move(self, row, col):
         piece = self.board.get_piece(row, col)
-        if self.selected and (row, col) in self.valid_moves:
+        if self.selected and (row, col) in [(move[0], move[1]) for move in self.valid_moves]:
             if piece == 0 or piece.color != self.selected.color:
+                # Handle castling
                 if self.selected.type == "King" and abs(self.selected.col - col) == 2:
-                    # Enroque
                     self.perform_castling(self.selected, row, col)
                 else:
+                    en_passant = (row, col) in [(move[0], move[1]) for move in self.valid_moves if len(move) == 3 and move[2]]
                     if self.simulate_move(self.selected, row, col):
                         self.remove_piece(self.board.Board, piece, row, col)
                         self.board.move(self.selected, row, col)
+                        if en_passant:
+                            if self.selected.color == White:
+                                self.board.Board[row + 1][col] = 0  # Remove the captured pawn
+                            else:
+                                self.board.Board[row - 1][col] = 0  # Remove the captured pawn
                         self.change_turn()
                         self.valid_moves = []
                         self.selected = None

@@ -23,6 +23,8 @@ class TestBoardInitialization(unittest.TestCase):
         self.assertIsInstance(self.board.Board[6][0], Pawn)
         self.assertIsInstance(self.board.Board[0][0], Rook)
         self.assertIsInstance(self.board.Board[7][0], Rook)
+        
+
 
 if __name__ == '__main__':
     unittest.main()
